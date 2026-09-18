@@ -31,12 +31,11 @@ Critical path A → B → E → F. C and D run concurrently with B, based solely
 
 - [x] Inspect repository, attached brief, subscription guard and authentication.
 - [x] Define task DAG, contracts and lane ownership.
-- [ ] Launch B, C, D in isolated worktrees using bounded five-part requests.
-- [ ] Build E shell and route integration while workers execute.
-- [ ] Review each captured diff; run lane checks; integrate accepted patches.
-- [ ] Run npm test, npm run typecheck, npm run build.
-- [ ] Rehearse select 18–20 → Why → Sarah → note → send → accept → revalidate 31 to 94 → manager approve.
-- [ ] Check decline, alternative dates, refresh, reset, mobile width, keyboard and Teams fallback.
-- [ ] Record actual validation evidence and startup instructions in README.
+- [x] Launch B, C, D in isolated worktrees using bounded five-part requests.
+- [x] Build E shell and route integration while workers execute.
+- [x] Review captured source patches and integrate recovered code; remove duplicate components.
+- [x] Run compile/build check and start production preview. User update: skip automated tests and extensive testing work.
+- [ ] Inspect integration for the brief's main story and ensure the UI opens correctly.
+- [x] Record actual build evidence and startup instructions in README and docs/HANDOFF.md.
 
 No deployment requested; local preview and static export are the deliverables. Real Teams/Azure/Entra and a production workforce solver remain future integrations, as prescribed by the brief.

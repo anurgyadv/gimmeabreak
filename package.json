@@ -1,6 +1,6 @@
 {
   "name": "coverassist", "version": "0.1.0", "private": true,
-  "scripts": {"dev":"next dev --hostname 127.0.0.1", "build":"next build", "start":"next start --hostname 127.0.0.1", "typecheck":"tsc --noEmit", "test":"vitest run", "test:e2e":"playwright test"},
+  "scripts": {"dev":"next dev --hostname 127.0.0.1", "build":"next build", "start":"node scripts/serve.mjs", "typecheck":"tsc --noEmit", "test":"vitest run", "test:e2e":"playwright test"},
   "dependencies": {"next":"^16.0.0", "react":"^19.0.0", "react-dom":"^19.0.0", "msw":"^2.12.0", "motion":"^12.0.0", "lucide-react":"^0.468.0", "@radix-ui/react-dialog":"^1.1.0", "tailwindcss":"^4.0.0", "@tailwindcss/postcss":"^4.0.0"},
   "devDependencies": {"typescript":"^5.9.0", "@types/node":"^22.0.0", "@types/react":"^19.0.0", "@types/react-dom":"^19.0.0", "vitest":"^3.2.0", "@playwright/test":"^1.55.0"},
   "msw": {"workerDirectory":["public"]}
