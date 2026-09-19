@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "archiveName": "OneDrive_2026-09-18.zip",
+  "archiveSha256": "e7daf53e41848e5a6316f48f5fb6268f2be697a1e212b59b9e7c46b89ecaa786",
+  "sourceRows": 945381,
+  "retainedRows": 900095,
+  "sources": [
+    {
+      "kind": "contracts",
+      "fileName": "Hackathon Synthetic Employee Details-Contracts.csv",
+      "archiveMember": "East Metropolitan Health Service/Hackathon Synthetic Employee Details-Contracts/Hackathon Synthetic Employee Details-Contracts.csv",
+      "rows": 10596,
+      "retainedRows": 9932,
+      "exactDuplicatesRemoved": 664,
+      "invalidRows": 0,
+      "columns": [
+        "Employee ID",
+        "Emp Start Date",
+        "Gender",
+        "Age",
+        "Terms of Employment Description",
+        "Position Name",
+        "Position Entry Start Date",
+        "Position Entry End Date",
+        "Total Position Entry Contract Hours",
+        "Employee Overall Job Type",
+        "Occupancy Status",
+        "Occupational Group",
+        "Account Code Description",
+        "Account Code",
+        "Rate Grouping",
+        "Position Rate ID",
+        "RoStar",
+        "Roster Unit",
+        "Roster Unit Description"
+      ]
+    },
+    {
+      "kind": "balances",
+      "fileName": "Hackathon Synthetic Leave Balances.csv",
+      "archiveMember": "East Metropolitan Health Service/Hackathon Synthetic Leave Balances/Hackathon Synthetic Leave Balances.csv",
+      "rows": 37551,
+      "retainedRows": 37551,
+      "exactDuplicatesRemoved": 0,
+      "invalidRows": 0,
+      "columns": [
+        "Date Effective",
+        "Employee ID",
+        "Leave Code",
+        "Leave Type Group Name",
+        "Total Leave Remaining Hours",
+        "Total Leave Untaken Hours",
+        "Booked Leave Hours",
+        "Has Excess Leave",
+        "Leave Anniversary Date"
+      ]
+    },
+    {
+      "kind": "leave",
+      "fileName": "Hackathon Synthetic Leave Taken.csv",
+      "archiveMember": "East Metropolitan Health Service/Hackathon Synthetic Leave Taken/Hackathon Synthetic Leave Taken.csv",
+      "rows": 346216,
+      "retainedRows": 301675,
+      "exactDuplicatesRemoved": 44538,
+      "invalidRows": 3,
+      "columns": [
+        "Employee ID",
+        "Leave Record Type",
+        "Leave Status Name",
+        "Leave Type Code",
+        "Leave Type Name",
+        "Leave Reason Name",
+        "Leave Start Date",
+        "Leave End Date",
+        "Leave Hours"
+      ]
+    },
+    {
+      "kind": "rosters",
+      "fileName": "Hackathon Synthetic Rosters.csv",
+      "archiveMember": "East Metropolitan Health Service/Hackathon Synthetic Rosters/Hackathon Synthetic Rosters.csv",
+      "rows": 551018,
+      "retainedRows": 550937,
+      "exactDuplicatesRemoved": 0,
+      "invalidRows": 81,
+      "columns": [
+        "Roster Unit",
+        "Roster Unit and Description",
+        "Employee ID",
+        "In RoStar",
+        "Pay Period Start Date",
+        "Pay Period End Date",
+        "Shift Date",
+        "Work Code",
+        "Shift Start Time",
+        "Shift End Time",
+        "Meal Break Duration"
+      ]
+    }
+  ],
+  "quality": {
+    "invalidContractEnds": 4648,
+    "invalidContractStarts": 0,
+    "invalidContractHours": 0,
+    "normalizedMealDurations": 6996,
+    "invalidRowsByReason": {
+      "leave:invalid_leave_dates": 3,
+      "rosters:meal_exceeds_shift": 77,
+      "rosters:invalid_roster_time": 4
+    }
+  },
+  "excludedFields": [
+    "Gender",
+    "Age",
+    "Leave Reason Name"
+  ],
+  "dateSemantics": "Only blank contract ends are open-ended. Nonblank NULL or invalid dates remain unresolved. Balances are keyed by employee + code + type. Meal duration 00:60 means 60 minutes.",
+  "databaseSha256": "a620be29df0d9ccfb0db4c8d387dedcb6f5fe8fa8c066376ac0ca88ac88d6085",
+  "compressedSha256": "5b4c360688610a4765a5c7540a08955c92cf46d53158442e92a553e9a55d8c19",
+  "databaseBytes": 143613952,
+  "compressedBytes": 19006397
+}

@@ -24,3 +24,6 @@ cco
 cco.ps1
 # Official policy originals are reproducible with scripts/fetch_policies.py
 data/policies/
+
+# Full workforce data is versioned only as a compressed, server-only artifact
+data/*.sqlite

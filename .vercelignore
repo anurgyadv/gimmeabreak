@@ -7,3 +7,8 @@ data/policies
 .agents
 .release-local
 __pycache__
+
+.env
+.env.*
+!.env.example
+data/*.sqlite

@@ -13,6 +13,14 @@ npm start
 
 Open http://127.0.0.1:3002. Development: `npm run dev`.
 
+## Connected assistant
+
+Copy `.env.example` to `.env.local` and configure the server variables described in [Foundry setup](docs/foundry-assistant.md). Credentials must never be placed in browser code. The assistant reports an unavailable connection when configuration is missing.
+
+The backend queries a read-only database containing **900,095 retained records from 945,381 source rows** across all four synthetic workforce CSVs. Balances, rosters and profiles use this full database; swap matching explicitly uses the validated candidate extract. See [full data provenance](docs/full-data.md). The compressed database is included only in server functions.
+
+Tool activity is visible in the chat panel. Requests require an explicit confirmation click; the model cannot approve leave or contact colleagues. Separate employee and manager access codes select the synthetic roles. These codes are not a substitute for organizational identity management.
+
 ## Workflow
 
 - **My leave:** source-backed annual, personal and long service balances; accrued/booked breakdown and local request reservations.
@@ -44,9 +52,9 @@ See `docs/policy-evidence.md` for source clauses and applicability.
 
 ## Boundaries
 
-This is a local application: browser storage, deterministic rule engine v1, no connected language model, authentication, external messaging, live roster writeback or payroll integration. User-requested HSS integration is outside the current interface. A local manager decision does not change the supplied source files. Colleague responses are explicitly previews.
+The Foundry assistant uses server-side model tool calls and a signed, access-code session for synthetic employee SYN008078. Confirmed assistant requests and manager decisions persist in private Azure Table Storage. Calendar-created requests still use browser storage. External messaging, live roster writeback, payroll and HSS integration are not connected. Colleague responses remain previews; manager approval requires clinical verification.
 
-The app can propose one colleague arrangement per request; remaining affected shifts are explicitly retained for manager review. Matching reserves proposed colleagues and return dates to avoid reuse by another active local request. Production deployment requires durable shared storage, real identities/permissions, approved communications, locally validated industrial applicability and clinical inputs.
+The app can propose one colleague arrangement per request; remaining affected shifts are explicitly retained for manager review. Matching reserves proposed colleagues and return dates to avoid reuse by another active local request. Real workforce deployment requires Entra employee identity mapping, approved communications, locally validated industrial applicability and clinical inputs.
 
 ## Verification
 
