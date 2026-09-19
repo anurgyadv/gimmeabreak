@@ -94,3 +94,18 @@ export function getLeave(employeeId:string,start:string,end:string):(LeaveRecord
   const file = sourceFile('leave');
   return rows.map(({sourceRow,...leave})=>({...leave,sourceId:`${file}#row=${sourceRow}`}));
 }
+
+/** Current valid home-unit staff plus known roster assignees, with unresolved contracts labelled. */
+export function getDepartmentEmployees(unit:string,asOf:string,rosterStart:string,rosterEnd:string):(EmployeeEvidence & {membershipBasis:string})[] {
+  validDate(asOf);validRange(rosterStart,rosterEnd);
+  const home = database().db.prepare("SELECT DISTINCT employeeId FROM contracts WHERE unit=? AND contractStart<=? AND (contractEnd>=? OR rawContractEnd='') AND contractStatus='verified'").all(unit,asOf,asOf) as {employeeId:string}[];
+  const roster = database().db.prepare('SELECT DISTINCT employeeId FROM rosters WHERE unit=? AND date>=? AND date<=?').all(unit,rosterStart,rosterEnd) as {employeeId:string}[];
+  const rosterIds=new Set(roster.map(row=>row.employeeId));
+  return [...new Set([...home,...roster].map(row=>row.employeeId))].sort().flatMap(id=>{
+    const employee=getEmployee(id,asOf);
+    if(!employee)return [];
+    const currentHome=employee.unit===unit&&employee.contractStatus==='verified';
+    if(!currentHome&&!rosterIds.has(id))return [];
+    return [{...employee,membershipBasis:currentHome?`Current contract home unit ${unit}${rosterIds.has(id)?'; also rostered in the department':''}`:`Roster assignment in ${unit}, ${rosterStart}–${rosterEnd}; home unit ${employee.unit}${employee.contractStatus==='unresolved'?'; contract eligibility unresolved':''}`}];
+  });
+}

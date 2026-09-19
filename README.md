@@ -52,7 +52,17 @@ See `docs/policy-evidence.md` for source clauses and applicability.
 
 ## Boundaries
 
-The Foundry assistant uses server-side model tool calls and a signed, access-code session for synthetic employee SYN008078. Confirmed assistant requests and manager decisions persist in private Azure Table Storage. Calendar-created requests still use browser storage. External messaging, live roster writeback, payroll and HSS integration are not connected. Colleague responses remain previews; manager approval requires clinical verification.
+The Foundry assistant uses server-side model tool calls and a signed, access-code session for synthetic employee SYN008078. Confirmed assistant and calendar requests, manager decisions, and leave-plan invitations persist in private Azure Table Storage. Unsubmitted calendar drafts remain in browser storage. External messaging, live roster writeback, payroll and HSS integration are not connected. Colleague responses remain previews; manager approval requires clinical verification.
+
+## Department leave planning
+
+The manager calendar shows employees as rows and dates across each month, with coloured leave spans, filters and balance/history drawers. Department membership combines current home-unit contracts and fortnight roster assignments; it is an inferred membership, not an authoritative reporting hierarchy. History separates safely summable past Leave Taken records from future/booked records. Missing previous-year records mean unknown, not zero leave. Personal leave is descriptive and never a negative fairness score.
+
+Leave planning preserves source excess flags for manager review. Suggested annual or long-service dates use actual roster hours, balances, recorded absences and saved requests. Options rank recorded impact and show projected balances and daily same-role assignment counts. These counts do not establish shift coverage or nurse-patient ratio compliance. Suggestions are first steps toward an agreed plan, not certification that an employee becomes compliant.
+
+Managers can send an in-app planning invitation; the employee can discuss it or select suggested dates for a new request. This does not send email or approve leave. The current employee sign-in represents Sarah; invitations for other synthetic employees are stored but require future identity mapping for their own sign-in.
+
+Chat answers offer context-specific buttons, including alternative dates and shift options. When booked leave overlaps, a cancellation-watch card can be added locally. It is explicitly a cosmetic preview: no monitoring runs and no notifications are sent.
 
 The app can propose one colleague arrangement per request; remaining affected shifts are explicitly retained for manager review. Matching reserves proposed colleagues and return dates to avoid reuse by another active local request. Real workforce deployment requires Entra employee identity mapping, approved communications, locally validated industrial applicability and clinical inputs.
 

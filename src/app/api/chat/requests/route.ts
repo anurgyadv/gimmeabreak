@@ -1,6 +1,24 @@
-import {requireSession,sameOrigin,readBody,safeMessage} from '@/server/chat-security';
+import {requireSession,sameOrigin,readBody,safeMessage,validateLeaveInput} from '@/server/chat-security';
 import {listBookings,saveBooking,audit,withEmployeeLock} from '@/server/chat-store';
-import {canApprove} from '@/lib/workforce-engine';
+import {canApprove,assessWithRequests,findAvailableSwaps,submitForReview} from '@/lib/workforce-engine';
+import raw from '@/data/workforce.json';
+import policyRaw from '@/data/policies.json';
+import type {Booking,Workforce,PolicyIndex} from '@/lib/workforce-types';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 export async function GET(req:Request){try{const s=requireSession(req);return Response.json({requests:await listBookings(s.employeeId)},{headers:{'Cache-Control':'no-store'}})}catch{return Response.json({message:'Unlock the assistant first.'},{status:401})}}
+export async function POST(req:Request){try{
+ sameOrigin(req);const s=requireSession(req);if(s.role!=='employee')return Response.json({message:'Please unlock the assistant in employee view to submit your request.'},{status:403});
+ const body=await readBody(req,4000),input=validateLeaveInput({dates:body.dates,leaveCode:body.leaveCode,note:body.note});
+ if(typeof body.id!=='string'||!/^[a-f0-9-]{36}$/.test(body.id))throw new Error('Invalid decision request identifier.');
+ return await withEmployeeLock(s.employeeId,async()=>{
+  const requests=await listBookings(s.employeeId),prior=requests.find(r=>r.id===body.id);if(prior)return Response.json({ok:true,request:prior});
+  if(requests.some(r=>!['declined','changes-requested','colleague-declined'].includes(r.status)&&r.dates.some(d=>input.dates.includes(d))))throw new Error('A request already covers these dates.');
+  const w=raw as Workforce,p=policyRaw as unknown as PolicyIndex,assessment=assessWithRequests(w,p,input.dates,input.leaveCode,requests);
+  const swap=body.swapId?findAvailableSwaps(w,p,input.dates,requests).find(o=>o.id===body.swapId)||null:null;
+  if(body.swapId&&!swap)throw new Error('The request no longer has an available swap. Check it again.');
+  const at=new Date().toISOString();const draft:Booking={id:body.id,employeeId:s.employeeId,leaveCode:input.leaveCode,leaveType:input.leaveCode==='AL'?'Annual leave':input.leaveCode==='LS'?'Long service leave':'Personal leave',dates:input.dates,note:input.note,assessment,status:'assessed',swap,message:'',managerNote:'',createdAt:at,events:[{at,label:'Employee requested review',detail:'Saved from the leave calendar. Colleague agreement and clinical checks remain unverified.'}]};
+  const booking=submitForReview(w,p,draft,requests,at);if(!booking)throw new Error('The request no longer passes its checks. Please reassess it.');
+  const saved=await saveBooking(booking,true);await audit(s.employeeId,'calendar-request-submitted',{id:saved.id,dates:saved.dates,swapId:swap?.id});return Response.json({ok:true,request:saved});
+ });
+ }catch(e){const message=safeMessage(e);return Response.json({message},{status:message.includes('unlock')?401:400})}}
 export async function PATCH(req:Request){try{sameOrigin(req);const s=requireSession(req);if(s.role!=='manager')return Response.json({message:'Unlock the assistant with the manager access code to save a central decision.'},{status:403});return await withEmployeeLock(s.employeeId,async()=>{const body=await readBody(req,3000),b=(await listBookings(s.employeeId)).find(r=>r.id===body.id);if(!b||b.status!=='manager-review')throw new Error('Request is not awaiting review.');if(!['approved','declined','changes-requested'].includes(body.status))throw new Error('Invalid decision.');const note=typeof body.note==='string'?body.note.trim().slice(0,1000):'';if(body.status==='approved'&&!canApprove(b,body.verified===true))throw new Error('Confirm clinical verification before approving.');if(body.status!=='approved'&&!note)throw new Error('A decision reason is required.');const at=new Date().toISOString(),updated={...b,status:body.status,managerNote:note,events:[...b.events,{at,label:body.status,detail:note||'Manager confirmed clinical verification.'}]};await saveBooking(updated);await audit(s.employeeId,'manager-decision',{id:b.id,status:body.status,note});return Response.json({ok:true,request:updated})})}catch(e){return Response.json({message:safeMessage(e)},{status:400})}}

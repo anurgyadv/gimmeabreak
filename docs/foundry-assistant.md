@@ -28,7 +28,9 @@ An access-code session assumes synthetic employee SYN008078 (Sarah Chen); this i
 
 The model can prepare a signed10-minute confirmation proposal. It cannot submit or approve. Clicking Confirm calls a separate endpoint that checks identity/signature, reassesses balance/conflicts, serializes submissions with an employee lock and saves a central request. Repeated confirmation of the same proposal is idempotent. Managers separately confirm staffing/clinical checks, and written reasons are required for refusal/changes.
 
-Azure Table Storage keeps requests, audit events, counters and locks across Vercel instances. Local development can use an ignored file; production refuses that fallback. Assistant-created requests synchronize into the existing request UI. Existing locally created calendar requests remain local and are identified by their source path; migrating those legacy requests is not an identity/authentication system.
+Azure Table Storage keeps requests, planning invitations, audit events, counters and locks across Vercel instances. Local development can use an ignored file; production refuses that fallback. Newly submitted calendar and assistant requests share the central request store. Unsubmitted drafts and legacy browser-only records remain local.
+
+Manager-only tools provide monthly department leave, employee history and ranked leave-plan options. The department API enforces the manager role and target membership; employee invitations are restricted to the signed employee. Invitations support in-app replies but do not send external messages or approve leave. Cancellation-watch cards are local cosmetic previews with no active scheduler.
 
 No Teams/email connector is configured. The assistant must not claim it sent a message or obtained colleague consent. Do not mistake the existing colleague response preview for external messaging.
 

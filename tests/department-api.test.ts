@@ -1,0 +1,15 @@
+import {beforeAll,describe,it,expect} from 'vitest';
+import {GET as department} from '../src/app/api/department/route';
+import {GET as inbox,POST as invite,PATCH as reply} from '../src/app/api/department/invitations/route';
+import {signValue} from '../src/server/chat-security';
+import {getLeavePlan} from '../src/server/department-insights';
+import {executeTool} from '../src/server/chat-tools';
+const key='department-tests-'.repeat(3),employee={sid:'employee',employeeId:'SYN008078',role:'employee' as const,exp:9999999999};
+const manager={...employee,sid:'manager',role:'manager' as const};
+const req=(path:string,role:'employee'|'manager',body?:unknown,method='POST')=>new Request('http://localhost'+path,{method:body?method:'GET',headers:{Origin:'http://localhost',Cookie:'gimme_session='+signValue(role==='manager'?manager:employee,key),'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+beforeAll(()=>{process.env.CHAT_SESSION_SECRET=key;process.env.CHAT_LOCAL_STORE=process.cwd()+'/.release-local/test-department-api-'+Date.now()+'.json'});
+describe('department authorization and invitations',()=>{
+ it('protects department histories and model tools from employee sessions',async()=>{expect((await department(req('/api/department?month=2026-09','employee'))).status).toBe(403);await expect(executeTool('get_employee_leave_history',{employeeId:'SYN008078'},employee)).rejects.toThrow('manager');expect((await department(new Request('http://localhost/api/department'))).status).toBe(401)});
+ it('does not let employees send invitations or read another inbox',async()=>{expect((await invite(req('/api/department/invitations','employee',{employeeId:'SYN008078',message:'x',dates:[]}))).status).toBe(403);expect((await inbox(req('/api/department/invitations?employeeId=SYN000001','employee'))).status).toBe(403)});
+ it('rejects invented dates and preserves the server-generated balance and hours',async()=>{const plan=getLeavePlan('SYN008078'),dates=plan.suggestions[0].dates;expect((await invite(req('/api/department/invitations','manager',{employeeId:plan.employeeId,leaveCode:plan.leaveCode,dates:['2027-01-01'],message:'Let’s plan leave.'}))).status).toBe(400);const body={employeeId:plan.employeeId,leaveCode:plan.leaveCode,dates,message:'Let’s agree on a leave plan.',hours:999999};const response=await invite(req('/api/department/invitations','manager',body));expect(response.status).toBe(200);const saved=await response.json();expect(saved.invitation.hours).toBe(plan.suggestions[0].hours);const repeated=await invite(req('/api/department/invitations','manager',body));expect((await repeated.json()).invitation.id).toBe(saved.invitation.id);const messages=await (await inbox(req('/api/department/invitations','employee'))).json();expect(messages.invitations).toHaveLength(1);expect((await reply(req('/api/department/invitations','employee',{id:saved.invitation.id,status:'discuss'},'PATCH'))).status).toBe(200);expect((await reply(req('/api/department/invitations','manager',{id:saved.invitation.id,status:'interested'},'PATCH'))).status).toBe(403)});
+});
