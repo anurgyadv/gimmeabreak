@@ -1,2 +1,2 @@
-import WorkforceDemo from '@/components/workforce/WorkforceDemo';
-export default function HomePage() { return <WorkforceDemo />; }
+import GimmeApp from '@/components/gimme/GimmeApp';
+export default function HomePage() { return <GimmeApp />; }

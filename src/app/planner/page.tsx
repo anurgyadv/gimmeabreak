@@ -1,2 +1,2 @@
-import WorkforceDemo from '@/components/workforce/WorkforceDemo';
-export default function PlannerPage() { return <WorkforceDemo />; }
+import GimmeApp from '@/components/gimme/GimmeApp';
+export default function PlannerPage() { return <GimmeApp initialView="planning" />; }

@@ -1,0 +1,3 @@
+import {it,expect} from 'vitest';
+import w from '../src/data/workforce.json';import p from '../src/data/policies.json';import {findSwaps} from '../src/lib/workforce-engine';import type{Workforce,PolicyIndex}from '../src/lib/workforce-types';
+it('offers a genuine bilateral nursing swap with remaining clinical checks',()=>{const options=findSwaps(w as Workforce,p as unknown as PolicyIndex,['2026-09-21']);const swap=options.find(o=>o.kind==='swap');expect(swap).toBeDefined();expect(swap!.returnShift!.netHours).toBe(swap!.outgoing.netHours);expect(swap!.candidateHoursAfter).toBe(swap!.candidateHoursBefore);expect(swap!.unresolved.length).toBeGreaterThan(0)});

@@ -29,4 +29,4 @@ http.createServer(async (request, response) => {
   }
   response.writeHead(404, {'Content-Type':'text/plain; charset=utf-8'});
   response.end('Page not found');
-}).listen(port, '127.0.0.1', () => console.log(`CoverAssist: http://127.0.0.1:${port}`));
+}).listen(port, '127.0.0.1', () => console.log(`GimmeABreak: http://127.0.0.1:${port}`));

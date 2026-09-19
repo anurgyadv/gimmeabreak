@@ -1,0 +1,567 @@
+{
+  "retrievedAt": "2026-09-19",
+  "documents": [
+    {
+      "id": "ratios",
+      "title": "Nurse/Midwife to Patient Ratios Policy",
+      "number": "MP 0187/24",
+      "url": "https://www.health.wa.gov.au/About-us/Policy-frameworks/Clinical-Services-and-Planning/Mandatory-requirements/Nurse-Midwife-to-Patient-Ratios-Policy",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Policy-Frameworks/Clinical-Services-and-Planning/Nurse-Midwife-to-Patient-Ratios-Policy/Nurse-Midwife-to-Patient-Ratios-Policy.pdf",
+      "effectiveDate": "2024-09-30",
+      "version": "2.0; amended 16 February 2026",
+      "scope": "Only listed metropolitan wards at CAHS, EMHS, NMHS and SMHS; phased implementation.",
+      "sections": [
+        {
+          "id": "ratios-scope",
+          "heading": "1–3.1: Applicability",
+          "page": 1,
+          "summary": "Unlisted areas continue with Nursing Hours per Patient Day until their phase begins.",
+          "quote": "",
+          "topics": [
+            "scope"
+          ]
+        },
+        {
+          "id": "ratios-count",
+          "heading": "3.2.2–3.3.2: Count eligible direct-care staff",
+          "page": 2,
+          "summary": "Count direct-care RN, EN and midwives. Exclude AINs, supernumerary roles and the additional hands-free shift coordinator. Round required direct-care staff up.",
+          "quote": "",
+          "topics": [
+            "ratio",
+            "staffing"
+          ]
+        },
+        {
+          "id": "ratios-skill",
+          "heading": "3.3.3: Skill mix",
+          "page": 2,
+          "summary": "Clinical judgement determines the mix required for demand and acuity; this policy does not prescribe a universal senior-to-junior percentage.",
+          "quote": "",
+          "topics": [
+            "skill-mix"
+          ]
+        },
+        {
+          "id": "ratios-shift",
+          "heading": "3.4.1: Ward-level coverage",
+          "page": 3,
+          "summary": "Meet the ward-wide ratio on every shift; patient assignments within the ward may vary.",
+          "quote": "",
+          "topics": [
+            "ratio",
+            "swap"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ratios-scope",
+      "title": "Nurse/Midwife to Patient Ratios: Wards/Units in Scope for Implementation",
+      "number": "MP 0187/24 related document",
+      "url": "https://www.health.wa.gov.au/About-us/Policy-frameworks/Clinical-Services-and-Planning/Mandatory-requirements/Nurse-Midwife-to-Patient-Ratios-Policy",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Policy-Frameworks/Clinical-Services-and-Planning/Nurse-Midwife-to-Patient-Ratios-Policy/Supporting/Nurse-Midwife-to-Patient-Ratios-Wards-Units-in-Scope-for-Implementation.pdf",
+      "effectiveDate": null,
+      "version": "Schedule retrieved 19 September 2026; includes 23 February 2026 critical-care phase",
+      "scope": "Named wards only. PDF page numbers include cover; printed schedule pages differ.",
+      "sections": [
+        {
+          "id": "ratio-medical",
+          "heading": "Table 1: Listed medical/surgical wards",
+          "page": 2,
+          "summary": "Listed wards require one nurse per four patients on AM/PM, plus one HFSC; night requires one per seven. Implementation dates vary by named ward.",
+          "quote": "",
+          "topics": [
+            "ratio"
+          ]
+        },
+        {
+          "id": "ratio-critical",
+          "heading": "Table 1: Listed critical-care wards",
+          "page": 5,
+          "summary": "Listed ICU/NICU/paediatric critical-care areas use 1:1, or 1:2 for lower-acuity patients, plus HFSC each shift. Listed coronary-care areas use 1:2 AM/PM and 1:3 nights, plus HFSC.",
+          "quote": "",
+          "topics": [
+            "ratio",
+            "acuity"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "accrued-leave",
+      "title": "Management of Accrued Leave Policy",
+      "number": "MP 0100/18",
+      "url": "https://www.health.wa.gov.au/About-us/Policy-frameworks/Workforce-and-Employment/Mandatory-requirements/Industrial-Relations/Management-of-Accrued-Leave-Policy",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Policy-Frameworks/Workforce-and-employment/Management-of-Accrued-Leave-Policy/Management-of-Accrued-Leave-Policy.pdf",
+      "effectiveDate": "2018-11-22",
+      "version": "2.0; amended 23 February 2026",
+      "scope": "WA health entities; annual and long-service leave. Industrial instruments and law prevail.",
+      "sections": [
+        {
+          "id": "leave-balance",
+          "heading": "3: Accrued leave management",
+          "page": 1,
+          "summary": "Subject to the applicable instrument, manage annual leave within two entitlements and take each long-service entitlement within two years, or three where allowed.",
+          "quote": "",
+          "topics": [
+            "balance"
+          ]
+        },
+        {
+          "id": "leave-approval",
+          "heading": "3.2: Manager review",
+          "page": 2,
+          "summary": "Before approval, consider balances, organisational priorities, holiday preferences, fairness, equity, financial impact and applicable industrial provisions. Agree leave timing with the employee.",
+          "quote": "",
+          "topics": [
+            "approval",
+            "equity",
+            "balance"
+          ]
+        },
+        {
+          "id": "leave-planning",
+          "heading": "3.3–3.4: Workforce planning",
+          "page": 2,
+          "summary": "Employees give sufficient notice; managers plan staffing and leave patterns for safe service delivery and periods of high demand.",
+          "quote": "",
+          "topics": [
+            "staffing",
+            "leave"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-policy",
+      "title": "Artificial Intelligence Policy",
+      "number": "MP 0193/25",
+      "url": "https://www.health.wa.gov.au/About-us/Policy-frameworks/Digital-Health/Mandatory-requirements/Artificial-Intelligence-Policy",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Policy-Frameworks/Digital-Health/Artificial-Intelligence-Policy/Artificial-Intelligence-Policy.pdf",
+      "effectiveDate": "2025-09-10",
+      "version": "1.1; amended 12 February 2026",
+      "scope": "WA health entities, including proposed AI uses, pilots and internally developed tools.",
+      "sections": [
+        {
+          "id": "ai-governance",
+          "heading": "3.1–3.4: Governance and assurance",
+          "page": 2,
+          "summary": "Comply with the AI Standard, assign an accountable officer, perform required assessments before implementation and maintain ongoing monitoring and risk management.",
+          "quote": "",
+          "topics": [
+            "governance"
+          ]
+        },
+        {
+          "id": "ai-training",
+          "heading": "3.5: Workforce capability",
+          "page": 2,
+          "summary": "Staff using or implementing AI must be appropriately informed, trained and qualified.",
+          "quote": "",
+          "topics": [
+            "governance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-standard",
+      "title": "Artificial Intelligence Standard",
+      "number": "MP 0193/25 related document",
+      "url": "https://www.health.wa.gov.au/About-us/Policy-frameworks/Digital-Health/Mandatory-requirements/Artificial-Intelligence-Policy",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Policy-Frameworks/Digital-Health/Artificial-Intelligence-Policy/Supporting/ArtificiaI-Intelligence-Standard.pdf",
+      "effectiveDate": null,
+      "version": "Retrieved 19 September 2026",
+      "scope": "Mandatory supporting standard for AI use under MP 0193/25.",
+      "sections": [
+        {
+          "id": "ai-human",
+          "heading": "8, Principle 2: Human-centred values",
+          "page": 9,
+          "summary": "Humans retain control of healthcare and clinical decisions; AI supports clinicians who make final decisions.",
+          "quote": "",
+          "topics": [
+            "human-review"
+          ]
+        },
+        {
+          "id": "ai-explain",
+          "heading": "8, Principles 6–8: Explainability, contestability and accountability",
+          "page": 14,
+          "summary": "Make AI use understandable, provide review mechanisms and preserve human oversight and accountability.",
+          "quote": "",
+          "topics": [
+            "explanation",
+            "audit"
+          ]
+        },
+        {
+          "id": "ai-limitations",
+          "heading": "8, Principle 1: Wellbeing",
+          "page": 9,
+          "summary": "Document purpose, benefits, data, flaws and limitations; involve relevant stakeholders.",
+          "quote": "",
+          "topics": [
+            "data",
+            "limitations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anf-2024",
+      "title": "WA Health System – ANF Nursing and Midwifery Industrial Agreement 2024",
+      "number": "2025 WAIRC 00098",
+      "url": "https://www.health.wa.gov.au/articles/a_e/awards-and-agreements",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Documents/Health-for/Industrial-relations/Awards-and-agreements/Nurses-Registered-and-Enrolled-Mental-Health/WA-Health-ANF-Agreement-2024.pdf",
+      "effectiveDate": "2025-02-19",
+      "version": "2024 agreement; registered 19 February 2025",
+      "scope": "Registered nurses, midwives, enrolled mental-health and mothercraft nurses within agreement coverage.",
+      "sections": [
+        {
+          "id": "anf-hours",
+          "heading": "28(2): Ordinary hours",
+          "page": 57,
+          "summary": "Average 38 hours weekly; ordinary roster arrangements can use 80 hours per fortnight with ADO accrual, or agreed alternatives. FTE and arrangement matter.",
+          "quote": "",
+          "topics": [
+            "hours"
+          ]
+        },
+        {
+          "id": "anf-rest",
+          "heading": "28(11)–(12): Shift transitions",
+          "page": 59,
+          "summary": "Night/day transitions require 20 hours free of duty; evening-to-day requires 9.5 hours. Clause 29 permits agreed flexible arrangements.",
+          "quote": "",
+          "topics": [
+            "rest",
+            "swap"
+          ]
+        },
+        {
+          "id": "anf-duties",
+          "heading": "28(14)–(15): Days off and duties",
+          "page": 59,
+          "summary": "Two full days off weekly or four fortnightly. Normally at most seven consecutive duties and ten per fortnight; ten-hour nights have five/eight limits. Exceptions require review.",
+          "quote": "",
+          "topics": [
+            "rest"
+          ]
+        },
+        {
+          "id": "anf-overtime",
+          "heading": "30(4): Overtime rest",
+          "page": 65,
+          "summary": "Overtime normally requires 9.5 hours between shifts, with specific release and penalty provisions.",
+          "quote": "",
+          "topics": [
+            "overtime",
+            "rest"
+          ]
+        },
+        {
+          "id": "anf-leave",
+          "heading": "33(16)–(21): Taking annual leave",
+          "page": 75,
+          "summary": "Annual leave can be taken in portions of at least one day by employer–employee agreement. Excess-leave provisions include a prior-denial exception.",
+          "quote": "",
+          "topics": [
+            "leave",
+            "approval"
+          ]
+        },
+        {
+          "id": "anf-response",
+          "heading": "33(1)(b)-(e): Annual leave response and refusal",
+          "page": 72,
+          "summary": "Respond within 14 days of submission. A refusal must be reasonable, written and explained within that time; specify any operational reasons.",
+          "quote": "",
+          "topics": [
+            "approval",
+            "response-time"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "uwu-2024",
+      "title": "WA Health System – UWU Enrolled Nurses and Associated Staff Industrial Agreement 2024",
+      "number": "UWU 2024",
+      "url": "https://www.health.wa.gov.au/articles/a_e/awards-and-agreements",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Documents/Health-for/Industrial-relations/Awards-and-agreements/Enrolled-nurses/WA-Health-System--United-Workers-Union-WA--Enrolled-Nurses-Assistants-in-Nursing-Aboriginal-Health-W.pdf",
+      "effectiveDate": null,
+      "version": "2024 agreement",
+      "scope": "Enrolled nurses, AINs, Aboriginal health workers/practitioners and ethnic health workers covered by the instrument.",
+      "sections": [
+        {
+          "id": "uwu-hours",
+          "heading": "18.1: Ordinary hours",
+          "page": 28,
+          "summary": "Average 38 hours weekly using specified cycles, including 76-hour or 80-hour fortnights with different ADO arrangements.",
+          "quote": "",
+          "topics": [
+            "hours"
+          ]
+        },
+        {
+          "id": "uwu-rest",
+          "heading": "20.4: Shift changes",
+          "page": 33,
+          "summary": "Night/day transitions require 20 hours unless otherwise agreed. Evening-to-day requires 9.5 hours, with an eight-hour exception in country hospitals below regional level.",
+          "quote": "",
+          "topics": [
+            "rest",
+            "swap"
+          ]
+        },
+        {
+          "id": "uwu-leave",
+          "heading": "41: Annual leave",
+          "page": null,
+          "summary": "This agreement has its own annual-leave provisions; do not apply ANF entitlements automatically to UWU-covered staff.",
+          "quote": "",
+          "topics": [
+            "leave"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "awards-library",
+      "title": "Awards and Agreements Library",
+      "number": null,
+      "url": "https://www.health.wa.gov.au/articles/a_e/awards-and-agreements",
+      "pdfUrl": null,
+      "effectiveDate": null,
+      "version": "Page last reviewed 20 April 2026",
+      "scope": "WA public-health employment instruments.",
+      "sections": [
+        {
+          "id": "awards-routing",
+          "heading": "Instrument selection",
+          "page": null,
+          "summary": "The library separates nursing, medical, enrolled-nurse, public-service and salaried-officer agreements. Select the employee's actual instrument before applying conditions.",
+          "quote": "",
+          "topics": [
+            "scope"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "policy-frameworks",
+      "title": "WA Health Policy Frameworks",
+      "number": null,
+      "url": "https://www.health.wa.gov.au/About-us/Policy-frameworks",
+      "pdfUrl": null,
+      "effectiveDate": null,
+      "version": "Retrieved 19 September 2026",
+      "scope": "WA health-system policy framework directory.",
+      "sections": [
+        {
+          "id": "frameworks",
+          "heading": "Mandatory frameworks",
+          "page": null,
+          "summary": "Frameworks group binding policies and define scope for local procedures. This index follows the user-specified staffing, leave and AI documents.",
+          "quote": "",
+          "topics": [
+            "scope"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ama-2024",
+      "title": "WA Health System - Medical Practitioners - AMA Industrial Agreement 2024",
+      "number": "2024 WAIRC 00992",
+      "url": "https://www.health.wa.gov.au/articles/a_e/awards-and-agreements",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Documents/Health-for/Industrial-relations/Awards-and-agreements/Doctors/Medical-practitioners-AMA-industrial-agreement-2024.pdf",
+      "effectiveDate": "2024-11-28",
+      "version": "2024 agreement; registered 28 November 2024",
+      "scope": "Covered medical practitioners; excludes clinical academics and specified executive services under clause 3.",
+      "sections": [
+        {
+          "id": "ama-response",
+          "heading": "34(11): Annual leave confirmation",
+          "page": 46,
+          "summary": "Confirm in writing when annual leave may be taken within two weeks of receiving the written application.",
+          "quote": "",
+          "topics": [
+            "approval",
+            "response-time"
+          ]
+        },
+        {
+          "id": "ama-backfill",
+          "heading": "34(14): Annual leave staffing",
+          "page": 47,
+          "summary": "Backfill for leave of two weeks or less requires urgent clinical/service grounds and delegated approval.",
+          "quote": "",
+          "topics": [
+            "staffing",
+            "coverage"
+          ]
+        },
+        {
+          "id": "ama-excess",
+          "heading": "34(13): Accrued annual leave",
+          "page": 46,
+          "summary": "More than two years of accrued pro-rata entitlements triggers written notice to reduce leave within 12 months under an agreed plan.",
+          "quote": "",
+          "topics": [
+            "balance"
+          ]
+        },
+        {
+          "id": "ama-swap",
+          "heading": "16(6): Doctors-in-training roster changes",
+          "page": 17,
+          "summary": "Clinically appropriate mutual replacement requires Head of Department or nominee approval.",
+          "quote": "",
+          "topics": [
+            "swap",
+            "approval"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "workforce-framework",
+      "title": "Nursing and Midwifery Workforce Planning Framework",
+      "number": "MP 0187/24 supporting information",
+      "url": "https://www.health.wa.gov.au/About-us/Policy-frameworks/Clinical-Services-and-Planning/Mandatory-requirements/Nurse-Midwife-to-Patient-Ratios-Policy",
+      "pdfUrl": "https://www.health.wa.gov.au/~/media/Corp/Policy-Frameworks/Clinical-Services-and-Planning/Nurse-Midwife-to-Patient-Ratios-Policy/Supporting/Nursing-and-Midwifery-Workforce-Planning-Framework.pdf",
+      "effectiveDate": null,
+      "version": "2.0; 16 February 2026",
+      "scope": "Planning guidance supporting service profiles; linked policy distinguishes this supporting information from mandatory related documents.",
+      "sections": [
+        {
+          "id": "workforce-skill",
+          "heading": "Introduction and service profiles",
+          "page": 5,
+          "summary": "Minimum ratios do not cover all staffing needs. Local clinical judgement determines skill mix; service profiles address demand, acuity and additional roles.",
+          "quote": "",
+          "topics": [
+            "skill-mix",
+            "acuity"
+          ]
+        },
+        {
+          "id": "workforce-roster",
+          "heading": "Step 7: Allocate hours to service requirements",
+          "page": 43,
+          "summary": "Roster allocation considers time, weekday, skill mix, seasonal variation, multidisciplinary availability and local service needs.",
+          "quote": "",
+          "topics": [
+            "staffing",
+            "roster"
+          ]
+        }
+      ]
+    }
+  ],
+  "rules": {
+    "minimumRestHours": null,
+    "restSource": "Conditional: ANF 28(11)–(12), 30(4); UWU 20.4. No universal minimum inferred.",
+    "restRules": [
+      {
+        "hours": 20,
+        "transition": "night-to-day or day-to-night",
+        "source": "anf-2024:anf-rest",
+        "condition": "ANF-covered staff, subject to approved clause 29 arrangements"
+      },
+      {
+        "hours": 9.5,
+        "transition": "evening-to-day",
+        "source": "anf-2024:anf-rest",
+        "condition": "ANF-covered staff"
+      },
+      {
+        "hours": 9.5,
+        "transition": "after overtime",
+        "source": "anf-2024:anf-overtime",
+        "condition": "Subject to clause 30(4) provisions"
+      }
+    ],
+    "ratios": [
+      {
+        "setting": "Listed medical/surgical wards",
+        "shift": "AM/PM",
+        "patientsPerNurse": 4,
+        "source": "ratios-scope:ratio-medical",
+        "scopeNote": "Named ward and commencement date must match; add one HFSC beyond direct-care count."
+      },
+      {
+        "setting": "Listed medical/surgical wards",
+        "shift": "Night",
+        "patientsPerNurse": 7,
+        "source": "ratios-scope:ratio-medical",
+        "scopeNote": "Named ward and commencement date must match; assess clinical need for HFSC."
+      }
+    ],
+    "annualLeaveApprovalSource": "accrued-leave:leave-approval; anf-2024:anf-leave",
+    "responseDaysByInstrument": {
+      "ANF_2024": 14,
+      "AMA_2024": 14
+    },
+    "responseConditionsByInstrument": {
+      "ANF_2024": {
+        "leaveType": "Annual Leave",
+        "startsAt": "applicationSubmittedAt",
+        "source": "anf-2024:anf-response",
+        "writtenRefusalReasonsRequired": true,
+        "operationalReasonsMustBeSpecific": true
+      },
+      "AMA_2024": {
+        "leaveType": "Annual Leave",
+        "startsAt": "writtenApplicationReceivedAt",
+        "source": "ama-2024:ama-response",
+        "action": "Written confirmation of when leave can be taken; not automatic approval."
+      }
+    },
+    "rosterLimitsByInstrument": {
+      "ANF_2024": {
+        "maxConsecutiveDuties": 7,
+        "maxDutiesPerFortnight": 10,
+        "minimumFullDaysOffPerWeek": 2,
+        "minimumFullDaysOffPerFortnight": 4,
+        "daysOffOperator": "weekly OR fortnightly",
+        "maxConsecutiveTenHourNights": 5,
+        "maxTenHourNightsPerFortnight": 8,
+        "source": "anf-2024:anf-duties",
+        "conditions": [
+          "Seven consecutive duties is a where-practicable provision; an employee request and employer approval can permit more.",
+          "Five consecutive ten-hour nights has an employee-request/employer-approval exception.",
+          "Days off are consecutive where practicable; apply clause 28(14) night-shift sequencing.",
+          "Approved clause 29 flexible arrangements may vary methods; do not infer an exception without evidence.",
+          "Count whole days free from duty, including cross-midnight shifts; check roster history at fortnight edges."
+        ]
+      }
+    },
+    "excessLeaveAssessment": {
+      "useImportedExcessFlags": true,
+      "inferExcessFromHoursAlone": false,
+      "source": "accrued-leave:leave-balance; anf-2024:anf-leave; ama-2024:ama-excess",
+      "requiredContext": [
+        "instrument",
+        "FTE",
+        "entitlement category",
+        "additional leave eligibility",
+        "accrual dates",
+        "prior refused leave where relevant"
+      ],
+      "note": "Two entitlements is not a universal fixed-hour threshold. Preserve the source-system excess calculation; do not silently recalculate with a generic weeks-to-hours conversion."
+    }
+  },
+  "limitations": [
+    "Roster service-unit codes are not mapped to the named hospital wards in the ratio schedule; do not claim policy-ratio compliance without that mapping and patient census.",
+    "Clinical acuity, competencies and HFSC/direct-care assignments are needed to confirm safe skill mix.",
+    "Ordinary-hours limits depend on agreement, FTE, ADO arrangement and approved local arrangements; 76 or 80 hours is not a universal legal maximum.",
+    "Index contains focused nursing, staffing, accrued-leave and AI provisions, not every policy or award in the statewide directories.",
+    "Supervisor approval and employee agreement remain workflow requirements; automated readiness is not final approval.",
+    "Page references are one-based PDF page numbers, including covers and registration orders.",
+    "Response deadlines above concern annual leave under the identified instrument; they do not imply automatic approval or apply universally to all leave types."
+  ]
+}

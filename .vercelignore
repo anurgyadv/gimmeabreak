@@ -1,0 +1,9 @@
+.git
+.next
+node_modules
+out
+data/policies
+.orchestrator
+.agents
+.release-local
+__pycache__

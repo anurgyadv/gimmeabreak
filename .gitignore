@@ -9,3 +9,18 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .worktrees/
+
+# Local tools, caches and deployment credentials
+.env
+.env.*
+!.env.example
+.vercel/
+.release-local/
+__pycache__/
+*.pyc
+.agents/
+.orchestrator/
+cco
+cco.ps1
+# Official policy originals are reproducible with scripts/fetch_policies.py
+data/policies/

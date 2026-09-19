@@ -1,72 +1,59 @@
-# CoverAssist
+# GimmeABreak
 
-CoverAssist is an interactive hackathon demonstration of clinician leave impact analysis. It uses the structure and records from the supplied synthetic contracts, leave-balance, leave-history and roster files to tell one reliable user story:
+Employee leave planning and clinical-manager coordination, built from the supplied workforce archive and official WA Health policy documents.
 
-> Request leave → analyse operational impact → review evidence → coordinate cover
+## Run
 
-The demo is deliberately focused. A preparation script streams 945,381 source rows and packages a small derived JSON file containing the golden-path evidence. The browser performs the scripted interaction locally, so judging does not depend on a network connection, live AI service or Microsoft tenant.
-
-## Run the demo
-
-Requires Node.js 20.9 or newer.
-
-```sh
+```powershell
 npm install
-npm run dev
-```
-
-Open http://127.0.0.1:3000.
-
-For a production-style static build:
-
-```sh
 npm run build
+$env:PORT=3002
 npm start
 ```
 
-Open http://127.0.0.1:3001.
+Open http://127.0.0.1:3002. Development: `npm run dev`.
 
-## Scripted user story
+## Workflow
 
-1. `SYN001597`, a Resident Medical Officer, requests eight hours of annual leave on 21 September 2026.
-2. Select **Check my leave**. The interface visibly follows employee, balance, roster, coverage, candidate and policy checks.
-3. The result identifies one affected 07:00–15:30 shift in `SU0325`, Synthetic Emergency Department.
-4. The balance result remains unavailable because the supplied annual-leave snapshot is effective after the 18 September decision date.
-5. Open manager review. Three clinicians pass the hard filters; the demo shows the two with the most prior scheduled `SU0325` shifts.
-6. Select `SYN000894` or `SYN001237`. Each has 71.5 rostered pay-period hours and reaches 79.5 of 80 hours after the eight-hour shift.
-7. Select **Approve and coordinate** to produce the simulated Teams message.
-8. Use **Ask the evidence** throughout to answer likely judging questions.
+- **My leave:** source-backed annual, personal and long service balances; accrued/booked breakdown and local request reservations.
+- **Request leave:** select actual roster dates for 21 September–4 October 2026, leave type and a manager note.
+- **Booking popup:** visible balance, roster, policy, skill-mix and coordination checks, with source links.
+- **Suggestions:** same-role/grade cover or equal-hour bilateral swaps. Both schedules are checked for roster/leave overlap, contract dates, hours, conditional rest, duty counts and full days off. Cross-ward suggestions retain competency checks for the manager. Swaps replace paid leave hours rather than deducting leave for a worked replacement duty.
+- **Colleague coordination:** clearly identified local response preview. No external message is sent. The manager confirms actual agreement.
+- **Clinical manager view:** separate department roster, historical scheduled staffing context, role mix and leave-request queue. Approval requires explicit clinical verification; decline and changes require reasons. Approved local changes appear in projected department counts.
+- **My requests:** local status and decisions persist across refresh. Annual-leave response deadlines start when submitted, with the ANF 14-day rule.
+- **Resources:** field/source lineage and indexed policy clauses. No generic staffing score or automatic leave decisions.
 
-## Logic behind the story
+## Data
 
-The data-preparation script:
+`scripts/build_workforce_data.py` processes every row of the four CSVs in `OneDrive_2026-09-18.zip`. The browser loads a bounded department/candidate extract: 232 employee records, 950 balance records, 2,760 roster records and 145 leave records, plus 56 days of descriptive staffing context. Source row identifiers are retained. Requester SYN008078 is displayed as Sarah Chen, a Registered Nurse with nine duties and 72 rostered hours. Names are presentation aliases, not source identities.
 
-- preserves source headers and row counts;
-- removes exact duplicates from matching logic;
-- validates dates without coercing malformed years;
-- trims roster work codes;
-- calculates overnight and meal-break-adjusted shift hours;
-- prevents leave-balance look-ahead;
-- matches active contracts by occupational group, role and rate;
-- excludes roster and booked-leave conflicts;
-- calculates pay-period hours and prior unit experience;
-- excludes age, gender and free-text reasons from matching.
+Balances are selected as of 19 September; current requester snapshots are 17 September. Invalid contract ends remain unresolved and cannot be silently treated as permanent contracts. Industrial instruments are inferred from recorded roles, explicitly unverified. Historical role uncertainty is recorded in the quality profile.
 
-Regenerate the derived dataset on the original machine with:
+See `docs/workforce-data-profile.md` for exact ingestion scope and quality limitations.
 
-```sh
-C:\Users\Anurag\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe scripts\prepare_demo_data.py
+## Policies and checks
+
+`scripts/fetch_policies.py` retrieves official sources. `data/policies/` holds nine PDFs, page-marked text and SHA256 provenance; `src/data/policies.json` indexes eleven source entries including ANF, UWU, AMA, ratios, AI policy/standard and accrued leave.
+
+The active matching workflow is nursing/ANF. Other instruments are indexed but do not inherit nursing rules. The rest checker applies 20 hours to day/night transitions; a conservative 9.5-hour floor otherwise is an application filter, not a universal agreement clause. It uses ordinary roster limits without assuming undocumented exceptions.
+
+The dataset lacks patient census, acuity, direct-care/HFSC designations and verified competencies/ward-policy mapping. Preserved headcount is not certified nurse-patient ratio compliance. ED historical scheduled counts remain descriptive context. Excess leave is a preserved source flag, not a made-up hours threshold.
+
+See `docs/policy-evidence.md` for source clauses and applicability.
+
+## Boundaries
+
+This is a local application: browser storage, deterministic rule engine v1, no connected language model, authentication, external messaging, live roster writeback or payroll integration. User-requested HSS integration is outside the current interface. A local manager decision does not change the supplied source files. Colleague responses are explicitly previews.
+
+The app can propose one colleague arrangement per request; remaining affected shifts are explicitly retained for manager review. Matching reserves proposed colleagues and return dates to avoid reuse by another active local request. Production deployment requires durable shared storage, real identities/permissions, approved communications, locally validated industrial applicability and clinical inputs.
+
+## Verification
+
+```powershell
+npm run typecheck
+npm test -- --reporter=dot
+npm run build
 ```
 
-The source attachment paths are defined near the top of `scripts/prepare_demo_data.py`. The runtime uses only `src/data/coverassist-demo.json`; the full CSV files are not committed or shipped.
-
-## Important boundaries
-
-- This is decision support, not automated leave approval.
-- Candidate cards are eligible options, not a definitive “best person” ranking.
-- Missing staffing, fatigue, credential and award rule text remains visibly unknown.
-- The demo does not claim that a roster is clinically safe.
-- AI explanation and Teams coordination are simulated.
-- The architecture is compatible with future FastAPI, governed workforce data, Microsoft Entra, Teams and Azure integration, but those services are not required for this demo.
-
-Automated test development is intentionally deferred. Current verification covers dataset regeneration, TypeScript, the static production build and a manual browser walkthrough of the complete story.
+Tests cover current-versus-future balances, overnight overlap, bilateral swaps, role/instrument restrictions, rest transitions, request reservations, declined colleague handling, submission timing and manager verification/projected rosters.
