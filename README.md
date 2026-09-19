@@ -1,8 +1,12 @@
 # CoverAssist
 
-A frontend prototype for exploring clinician leave, understanding coverage constraints, coordinating cover, and making a human approval decision.
+CoverAssist is an interactive hackathon demonstration of clinician leave impact analysis. It uses the structure and records from the supplied synthetic contracts, leave-balance, leave-history and roster files to tell one reliable user story:
 
-## Run locally
+> Request leave → analyse operational impact → review evidence → coordinate cover
+
+The demo is deliberately focused. A preparation script streams 945,381 source rows and packages a small derived JSON file containing the golden-path evidence. The browser performs the scripted interaction locally, so judging does not depend on a network connection, live AI service or Microsoft tenant.
+
+## Run the demo
 
 Requires Node.js 20.9 or newer.
 
@@ -11,41 +15,58 @@ npm install
 npm run dev
 ```
 
-Open http://127.0.0.1:3000. The application uses local assets and synthetic scenarios; it needs no API keys, AI subscription, or Teams tenant to run.
+Open http://127.0.0.1:3000.
+
+For a production-style static build:
 
 ```sh
 npm run build
 npm start
 ```
 
-Produces a static site in `out/` and serves it at http://127.0.0.1:3001. The bundled server supports clean URLs. Browser service workers require localhost or HTTPS. Do not open the HTML files directly with a `file:` URL.
+Open http://127.0.0.1:3001.
 
-## Demo story
+## Scripted user story
 
-1. Open the leave planner in November 2026. Select 18–20 November by dragging, clicking the start and end dates, or using the date fields.
-2. See feasibility fall to 31. Open the explanation: 18 November has only one remaining senior clinician against a synthetic minimum of two.
-3. Choose **Make this work**. Sarah is the best fit; James introduces a downstream rest conflict. Moving leave to 23–25 November is the no-cover alternative.
-4. Ask Sarah. Enter an optional personal note and try a phrasing suggestion. Explicitly choose **Use this** before the suggestion replaces your text.
-5. Send the simulated request and open the cover inbox. Accept as Sarah, then revalidate the roster to reach feasibility 94.
-6. Open the manager view and approve the revalidated request.
+1. `SYN001597`, a Resident Medical Officer, requests eight hours of annual leave on 21 September 2026.
+2. Select **Check my leave**. The interface visibly follows employee, balance, roster, coverage, candidate and policy checks.
+3. The result identifies one affected 07:00–15:30 shift in `SU0325`, Synthetic Emergency Department.
+4. The balance result remains unavailable because the supplied annual-leave snapshot is effective after the 18 September decision date.
+5. Open manager review. Three clinicians pass the hard filters; the demo shows the two with the most prior scheduled `SU0325` shifts.
+6. Select `SYN000894` or `SYN001237`. Each has 71.5 rostered pay-period hours and reaches 79.5 of 80 hours after the eight-hour shift.
+7. Select **Approve and coordinate** to produce the simulated Teams message.
+8. Use **Ask the evidence** throughout to answer likely judging questions.
 
-Use **Reset demo** to restore the initial state. `/demo` contains the walkthrough and an internal Cover Inbox fallback toggle. State persists in this browser between refreshes.
+## Logic behind the story
 
-## Architecture
+The data-preparation script:
 
-- Next.js App Router, React and TypeScript, with static export.
-- Tailwind, application-owned styling, Radix dialogs, Lucide icons, and Motion.
-- UI → typed React context → API client → ordinary HTTP requests intercepted by MSW → deterministic scenario service.
-- Service state owns evaluations, consent, revalidation and approval. A new evaluation invalidates the old resolution.
-- The same dispatcher supports an in-memory fallback if MSW cannot initialize.
-- `/planner?host=teams&subEntityId=leave-eval-1820` demonstrates an embedded host layout and a request deep link. Optional `theme=dark` or `theme=contrast` demonstrates host theming.
+- preserves source headers and row counts;
+- removes exact duplicates from matching logic;
+- validates dates without coercing malformed years;
+- trims roster work codes;
+- calculates overnight and meal-break-adjusted shift hours;
+- prevents leave-balance look-ahead;
+- matches active contracts by occupational group, role and rate;
+- excludes roster and booked-leave conflicts;
+- calculates pay-period hours and prior unit experience;
+- excludes age, gender and free-text reasons from matching.
 
-The workforce data, people, rules, AI phrasing and Teams messages are simulated. Feasibility is **not** an approval probability. There is no live Teams, Azure, Entra, AI service, or production scheduling solver integration.
+Regenerate the derived dataset on the original machine with:
 
-The product brief is in [docs/project-brief.md](docs/project-brief.md); implementation ownership and dependencies are in [docs/implementation-plan.md](docs/implementation-plan.md).
+```sh
+C:\Users\Anurag\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe scripts\prepare_demo_data.py
+```
 
-## Development approach
+The source attachment paths are defined near the top of `scripts/prepare_demo_data.py`. The runtime uses only `src/data/coverassist-demo.json`; the full CSV files are not committed or shipped.
 
-Codex owns architecture, contracts, integration and final inspection. Three bounded Claude Code lanes implement the scenario service, planner, and coordination screens in isolated worktrees using the user's Claude subscription. No provider API keys or paid API credits are used.
+## Important boundaries
 
-`npm run build` passed, including TypeScript and static export, on 18 September 2026. Automated test work was skipped at the user's request. Full visual and interaction review remains pending; see [docs/HANDOFF.md](docs/HANDOFF.md) for the resumable checkpoint.
+- This is decision support, not automated leave approval.
+- Candidate cards are eligible options, not a definitive “best person” ranking.
+- Missing staffing, fatigue, credential and award rule text remains visibly unknown.
+- The demo does not claim that a roster is clinically safe.
+- AI explanation and Teams coordination are simulated.
+- The architecture is compatible with future FastAPI, governed workforce data, Microsoft Entra, Teams and Azure integration, but those services are not required for this demo.
+
+Automated test development is intentionally deferred. Current verification covers dataset regeneration, TypeScript, the static production build and a manual browser walkthrough of the complete story.

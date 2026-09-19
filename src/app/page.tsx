@@ -1,2 +1,2 @@
-import Planner from '@/components/planner/Planner';
-export default function HomePage() { return <Planner />; }
+import WorkforceDemo from '@/components/workforce/WorkforceDemo';
+export default function HomePage() { return <WorkforceDemo />; }

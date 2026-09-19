@@ -1,0 +1,282 @@
+{
+  "provenance": {
+    "generatedAt": "2026-09-19T10:18:44+08:00",
+    "decisionDate": "2026-09-18",
+    "dataVersion": "hackathon-synthetic-derived-v1",
+    "sourceFiles": [
+      {
+        "kind": "contracts",
+        "fileName": "Hackathon Synthetic Employee Details-Contracts (1).csv",
+        "rowCount": 10596,
+        "columns": [
+          "Employee ID",
+          "Emp Start Date",
+          "Gender",
+          "Age",
+          "Terms of Employment Description",
+          "Position Name",
+          "Position Entry Start Date",
+          "Position Entry End Date",
+          "Total Position Entry Contract Hours",
+          "Employee Overall Job Type",
+          "Occupancy Status",
+          "Occupational Group",
+          "Account Code Description",
+          "Account Code",
+          "Rate Grouping",
+          "Position Rate ID",
+          "RoStar",
+          "Roster Unit",
+          "Roster Unit Description"
+        ]
+      },
+      {
+        "kind": "balances",
+        "fileName": "Hackathon Synthetic Leave Balances (1).csv",
+        "rowCount": 37551,
+        "columns": [
+          "Date Effective",
+          "Employee ID",
+          "Leave Code",
+          "Leave Type Group Name",
+          "Total Leave Remaining Hours",
+          "Total Leave Untaken Hours",
+          "Booked Leave Hours",
+          "Has Excess Leave",
+          "Leave Anniversary Date"
+        ]
+      },
+      {
+        "kind": "leave",
+        "fileName": "Hackathon Synthetic Leave Taken (1).csv",
+        "rowCount": 346216,
+        "columns": [
+          "Employee ID",
+          "Leave Record Type",
+          "Leave Status Name",
+          "Leave Type Code",
+          "Leave Type Name",
+          "Leave Reason Name",
+          "Leave Start Date",
+          "Leave End Date",
+          "Leave Hours"
+        ]
+      },
+      {
+        "kind": "rosters",
+        "fileName": "Hackathon Synthetic Rosters (1).csv",
+        "rowCount": 551018,
+        "columns": [
+          "Roster Unit",
+          "Roster Unit and Description",
+          "Employee ID",
+          "In RoStar",
+          "Pay Period Start Date",
+          "Pay Period End Date",
+          "Shift Date",
+          "Work Code",
+          "Shift Start Time",
+          "Shift End Time",
+          "Meal Break Duration"
+        ]
+      }
+    ],
+    "quality": {
+      "exactDuplicateCounts": {
+        "contracts": 664,
+        "balances": 0,
+        "leave": 44538,
+        "rosters": 0
+      },
+      "invalidDateCounts": {
+        "contracts": 4819,
+        "leave": 3
+      },
+      "trimmedWorkCodeCount": 455016
+    }
+  },
+  "scenario": {
+    "employee": {
+      "employeeId": "SYN001597",
+      "role": "Resident Medical Officer",
+      "rateId": "DBRM01",
+      "contractHours": 80.0,
+      "homeUnit": "SU0460",
+      "occupationalGroup": "MEDICAL",
+      "sourceFields": {
+        "Employee ID": "SYN001597",
+        "Position Name": "Resident Medical Officer",
+        "Position Entry Start Date": "2026-09-07",
+        "Position Entry End Date": "2028-01-30",
+        "Total Position Entry Contract Hours": "80.000000",
+        "Occupational Group": "MEDICAL",
+        "Rate Grouping": "RESIDENT MEDICAL OFFICER",
+        "Position Rate ID": "DBRM01",
+        "Roster Unit": "SU0460",
+        "Roster Unit Description": "SU0460 - Synthetic Clinical Service"
+      }
+    },
+    "request": {
+      "leaveType": "ANNUAL LEAVE",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-21",
+      "requestedHours": 8.0,
+      "sourceFields": {
+        "Employee ID": "SYN001597",
+        "Leave Record Type": "Booked Leave",
+        "Leave Status Name": "Future",
+        "Leave Type Code": "AL",
+        "Leave Type Name": "ANNUAL LEAVE",
+        "Leave Reason Name": "ANNUAL LEAVE",
+        "Leave Start Date": "2026-09-21 00:00:00.00",
+        "Leave End Date": "2026-09-21 00:00:00.00",
+        "Leave Hours": "8.000"
+      }
+    },
+    "balance": {
+      "status": "unavailable",
+      "explanation": "No annual-leave balance snapshot is effective on or before the decision date.",
+      "futureSnapshot": {
+        "effectiveDate": "2026-10-01",
+        "remainingHours": 97.256465
+      }
+    },
+    "affectedShifts": [
+      {
+        "rosterUnit": "SU0325",
+        "rosterUnitDescription": "SU0325 - Synthetic Emergency Department",
+        "shiftDate": "2026-09-21",
+        "startTime": "07:00",
+        "endTime": "15:30",
+        "mealBreakMinutes": 30,
+        "netHours": 8.0,
+        "workCode": "D8",
+        "payPeriodStart": "2026-09-21",
+        "payPeriodEnd": "2026-10-04",
+        "sourceFields": {
+          "Roster Unit": "SU0325",
+          "Roster Unit and Description": "SU0325 - Synthetic Emergency Department",
+          "Employee ID": "SYN001597",
+          "In RoStar": "Yes",
+          "Pay Period Start Date": "2026-09-21",
+          "Pay Period End Date": "2026-10-04",
+          "Shift Date": "2026-09-21",
+          "Work Code": "D8",
+          "Shift Start Time": "07:00",
+          "Shift End Time": "15:30",
+          "Meal Break Duration": "00:30"
+        }
+      }
+    ],
+    "candidates": [
+      {
+        "employeeId": "SYN000894",
+        "role": "Resident Medical Officer",
+        "rateId": "DBRM01",
+        "contractHours": 80.0,
+        "currentPayPeriodHours": 71.5,
+        "projectedPayPeriodHours": 79.5,
+        "rosterConflict": false,
+        "leaveConflict": false,
+        "homeUnit": "SU0430",
+        "priorUnitShiftCount": 48,
+        "lastWorkedInUnit": "2026-09-19",
+        "sourceFields": {
+          "Employee ID": "SYN000894",
+          "Position Name": "Resident Medical Officer",
+          "Total Position Entry Contract Hours": "80.000000",
+          "Occupational Group": "MEDICAL",
+          "Rate Grouping": "RESIDENT MEDICAL OFFICER",
+          "Position Rate ID": "DBRM01",
+          "Roster Unit": "SU0430"
+        }
+      },
+      {
+        "employeeId": "SYN001237",
+        "role": "Resident Medical Officer",
+        "rateId": "DBRM01",
+        "contractHours": 80.0,
+        "currentPayPeriodHours": 71.5,
+        "projectedPayPeriodHours": 79.5,
+        "rosterConflict": false,
+        "leaveConflict": false,
+        "homeUnit": "SU0430",
+        "priorUnitShiftCount": 40,
+        "lastWorkedInUnit": "2026-09-18",
+        "sourceFields": {
+          "Employee ID": "SYN001237",
+          "Position Name": "Resident Medical Officer",
+          "Total Position Entry Contract Hours": "80.000000",
+          "Occupational Group": "MEDICAL",
+          "Rate Grouping": "RESIDENT MEDICAL OFFICER",
+          "Position Rate ID": "DBRM01",
+          "Roster Unit": "SU0430"
+        }
+      }
+    ],
+    "eligibleCandidatePoolSize": 3,
+    "candidateSelectionNote": "Showing the two eligible clinicians with the most prior scheduled shifts in SU0325.",
+    "policyChecks": [
+      {
+        "id": "balance",
+        "name": "Leave balance at decision date",
+        "result": "unknown",
+        "explanation": "No annual-leave balance snapshot is effective on or before the decision date.",
+        "requiresManagerReview": true
+      },
+      {
+        "id": "staffing",
+        "name": "Staffing ratio",
+        "result": "unknown",
+        "explanation": "The supplied links do not contain the rule text.",
+        "requiresManagerReview": true
+      },
+      {
+        "id": "fatigue",
+        "name": "Fatigue and rest",
+        "result": "unknown",
+        "explanation": "No verified fatigue rule was supplied.",
+        "requiresManagerReview": true
+      },
+      {
+        "id": "credentials",
+        "name": "Credentials and skill mix",
+        "result": "unknown",
+        "explanation": "The source data does not contain full credential evidence.",
+        "requiresManagerReview": true
+      }
+    ],
+    "toolTrace": [
+      {
+        "id": "employee",
+        "label": "Employee context",
+        "status": "complete"
+      },
+      {
+        "id": "balance",
+        "label": "Balance lookup",
+        "status": "unavailable"
+      },
+      {
+        "id": "shifts",
+        "label": "Affected shifts",
+        "status": "complete"
+      },
+      {
+        "id": "coverage",
+        "label": "Coverage impact",
+        "status": "complete"
+      },
+      {
+        "id": "candidates",
+        "label": "Candidate filter",
+        "status": "complete"
+      },
+      {
+        "id": "policy",
+        "label": "Policy rules",
+        "status": "requires-review"
+      }
+    ]
+  }
+}

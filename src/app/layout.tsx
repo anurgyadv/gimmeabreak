@@ -3,8 +3,8 @@ import AppShell from '@/components/shell/AppShell';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'CoverAssist — A better way to plan leave',
-  description: 'Explore leave, understand coverage, and find a way forward. A synthetic workforce planning prototype.',
+  title: 'CoverAssist — Leave impact, explained',
+  description: 'An interactive, data-backed clinician leave and workforce coordination demo.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

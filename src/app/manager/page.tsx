@@ -1,2 +1,2 @@
-import ManagerDashboard from '@/components/manager/ManagerDashboard';
-export default function ManagerPage() { return <ManagerDashboard />; }
+import WorkforceDemo from '@/components/workforce/WorkforceDemo';
+export default function ManagerPage() { return <WorkforceDemo />; }

@@ -1,22 +1,19 @@
-'use client';
 import Link from 'next/link';
-import { ArrowRight, RotateCcw, CalendarDays, MessageSquare, ShieldCheck } from 'lucide-react';
-import { useDemo } from '@/lib/demo-context';
+import { ArrowLeft, Database, FileCheck2, GitBranch, ShieldCheck } from 'lucide-react';
+import demo from '@/data/coverassist-demo.json';
 
 export default function DemoPage() {
-  const demo = useDemo();
+  const totalRows = demo.provenance.sourceFiles.reduce((sum, file) => sum + file.rowCount, 0);
   return <div className="demo-page">
-    <p className="eyebrow">THE COMPLETE STORY</p><h1>A little time off.<br />A better way forward.</h1>
-    <p className="muted">Explore the CoverAssist prototype with a fully synthetic November roster.</p>
+    <p className="eyebrow">DEMO GUIDE</p>
+    <h1>The data behind the story</h1>
+    <p className="muted">The runtime is deliberately small. The preparation script reads the full supplied files, applies the same joins and calculations, then packages the evidence needed for a reliable offline demonstration.</p>
     <div className="demo-steps">
-      <section className="panel"><CalendarDays /><h2>1. Explore your leave</h2><p>Select 18–20 November to see the senior coverage constraint. Find better dates or ask Sarah to help.</p><Link className="button primary" href="/planner">Open leave planner <ArrowRight size={16} /></Link></section>
-      <section className="panel"><MessageSquare /><h2>2. Coordinate cover</h2><p>Write a personal note, preview the simulated Teams card, and switch to Sarah to accept.</p><Link className="button secondary" href="/teams-preview">Open cover inbox <ArrowRight size={16} /></Link></section>
-      <section className="panel"><ShieldCheck /><h2>3. Make the decision</h2><p>Revalidate the roster, see feasibility move from 31 to 94, then approve as the manager.</p><Link className="button secondary" href="/manager">Open manager view <ArrowRight size={16} /></Link></section>
+      <section className="panel"><Database /><h2>{totalRows.toLocaleString()} source rows</h2><p>Contracts, leave balances, leave records and roster shifts retain their original column structure and provenance.</p></section>
+      <section className="panel"><GitBranch /><h2>Deterministic tools</h2><p>Dates, shift hours, conflicts, pay-period capacity and prior-unit experience are calculated before any explanation is written.</p></section>
+      <section className="panel"><ShieldCheck /><h2>Human decision</h2><p>The system surfaces evidence and unknowns. It does not invent policy rules or approve leave autonomously.</p></section>
     </div>
-    <section className="panel demo-settings"><div><h2>Demo controls</h2><p className="muted">State stays in this browser. Reset restores the original roster.</p></div>
-      <label className="toggle-label"><input type="checkbox" checked={demo.teamsUnavailable} disabled={!!demo.busy} onChange={event => void demo.setTeamsUnavailable(event.target.checked)} />Use internal Cover Inbox instead of Teams preview</label>
-      <button className="button secondary" disabled={!!demo.busy} onClick={() => void demo.reset()}><RotateCcw size={15} /> Reset demo</button>
-    </section>
-    <p className="demo-disclosure">Synthetic identities and rules · Simulated AI and messaging · Designed for future Microsoft Teams and Azure integration</p>
+    <section className="panel demo-settings"><div><h2>Golden-path record</h2><p className="muted">SYN001597 · Annual leave · 21 September 2026 · SU0325 ED shift</p></div><div><h2>Eligible options</h2><p className="muted">SYN000894 and SYN001237 · 79.5 / 80 projected hours</p></div><Link className="button primary" href="/"><ArrowLeft size={15} /> Return to interactive story</Link></section>
+    <p className="demo-disclosure"><FileCheck2 size={13} /> The derived JSON can be regenerated from the supplied CSVs with scripts/prepare_demo_data.py.</p>
   </div>;
 }

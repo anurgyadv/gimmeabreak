@@ -27,9 +27,9 @@ The first complete scenario is fixed and evidence-backed:
 
 ## Architecture
 
-The browser application is Next.js, React and TypeScript. A FastAPI service provides stable HTTP contracts. DuckDB holds canonical workforce tables and derived evidence. A deterministic Python workforce engine performs calculations and candidate filtering. A lightweight orchestration layer sequences those tools and produces a templated explanation from structured evidence; no live LLM or paid API is required for the hackathon build.
+The browser application is Next.js, React and TypeScript. A deterministic Python preparation script streams the four supplied CSVs, applies the workforce checks, and emits a small derived evidence file. The interactive story runs entirely from that local artifact, so the hackathon demonstration remains reliable offline. A future production version can move the same boundaries behind FastAPI and a governed workforce database without changing the evidence model.
 
-The source CSVs named by the blueprint are not currently available. The first implementation will therefore load a small, explicit golden-path seed dataset derived only from values stated in the blueprint. The ingestion boundary will accept the four real CSVs later. The UI must label the active dataset as a blueprint-derived synthetic demonstration and must not imply that all 551,018 roster rows are loaded.
+The source CSVs are available during preparation but are intentionally not shipped with the browser bundle. The UI identifies the artifact as a derived synthetic demonstration and shows the complete source row counts and columns as provenance.
 
 ## Canonical model
 
@@ -72,6 +72,6 @@ The coordination view presents a simulated Teams-style message only after a huma
 
 ## Scope
 
-This increment includes the complete local golden path, real FastAPI and DuckDB boundaries, deterministic evidence, manager review, reset and simulated coordination. It excludes production Azure deployment, authentication, production HR writes, vector databases, optimisation solvers, real Teams connectors and live LLM calls.
+This increment includes the complete local golden path, reproducible CSV-derived evidence, manager review, reset and simulated coordination. It excludes a live backend runtime, production Azure deployment, authentication, production HR writes, vector databases, optimisation solvers, real Teams connectors and live LLM calls.
 
 Automated test authoring is deferred at the user's request. Implementation must still pass backend import and smoke checks, frontend TypeScript/build checks, and one manual golden-path walkthrough before handoff.

@@ -1,5 +1,7 @@
 # Data Driven CoverAssist Implementation Plan
 
+> **Implementation ruling 19 September 2026:** The user clarified that the deliverable is a reliable scripted interactive demo backed by real data structure, not a production-like service. The four CSVs are now available. The shipped implementation therefore streams the source files during preparation, commits a minimal derived evidence artifact, and runs the story entirely in the browser. FastAPI and DuckDB are retained as a production pathway rather than runtime dependencies. Cost if wrong: moving the same JSON contracts behind an API becomes a later integration task.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the fictional calendar-first prototype with the updated blueprint's data-backed clinician leave analysis and human manager decision workflow.

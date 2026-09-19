@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CoverAssist demo dataset",
+  "type": "object",
+  "required": [
+    "provenance",
+    "scenario"
+  ],
+  "properties": {
+    "provenance": {
+      "type": "object",
+      "required": [
+        "decisionDate",
+        "dataVersion",
+        "sourceFiles",
+        "quality"
+      ]
+    },
+    "scenario": {
+      "type": "object",
+      "required": [
+        "employee",
+        "request",
+        "balance",
+        "affectedShifts",
+        "candidates",
+        "policyChecks",
+        "toolTrace"
+      ]
+    }
+  }
+}
