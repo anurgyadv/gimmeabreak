@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BadgeCheck,
@@ -85,7 +85,7 @@ function formatDate(value?: string) {
 function answerQuestion(question: string, candidates: Candidate[]) {
   const first = candidates[0];
   if (question.startsWith('Why')) {
-    return 'The leave request overlaps a real rostered RMO shift in Synthetic Emergency Department. Coverage can be arranged, but the available policy links do not contain the rule text needed to declare the roster compliant, so a manager must decide.';
+    return 'The leave request overlaps a real rostered RMO shift in Synthetic Emergency Department. Candidate options were found, but the available policy links do not contain the rule text needed to declare the roster compliant, so a manager must decide.';
   }
   if (question.startsWith('How were')) {
     return 'The engine matched active contracts by occupational group, role and rate, then excluded anyone already rostered or on booked leave during the shift. Three people passed those hard filters; the demo shows the two with the most prior scheduled shifts in SU0325.';
@@ -110,14 +110,19 @@ export default function WorkforceDemo() {
   const [decision, setDecision] = useState<string | null>(null);
   const [question, setQuestion] = useState(questions[0]);
   const [showData, setShowData] = useState(false);
+  const [coordinationResponse, setCoordinationResponse] = useState<string | null>(null);
+  const analysisRun = useRef(0);
+  const sourcePanel = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const reset = () => {
+      analysisRun.current += 1;
       setStage(0);
       setRunning(false);
       setToolIndex(-1);
       setSelectedCandidate(null);
       setDecision(null);
+      setCoordinationResponse(null);
     };
     window.addEventListener('coverassist:reset', reset);
     return () => window.removeEventListener('coverassist:reset', reset);
@@ -127,11 +132,14 @@ export default function WorkforceDemo() {
 
   async function runAnalysis() {
     if (running) return;
+    analysisRun.current += 1;
+    const run = analysisRun.current;
     setRunning(true);
     setStage(1);
     for (let index = 0; index < toolLabels.length; index += 1) {
       setToolIndex(index);
       await new Promise((resolve) => window.setTimeout(resolve, 420));
+      if (analysisRun.current !== run) return;
     }
     setRunning(false);
     setStage(2);
@@ -140,6 +148,13 @@ export default function WorkforceDemo() {
   function resetDemo() {
     window.dispatchEvent(new Event('coverassist:reset'));
   }
+
+  function showDataPanel() {
+    setShowData(true);
+    window.requestAnimationFrame(() => sourcePanel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }
+
+  const stepIndex = stage === 2 ? 1 : stage === 3 ? 2 : stage === 4 ? 3 : stage;
 
   return (
     <div className="wf-demo">
@@ -157,14 +172,19 @@ export default function WorkforceDemo() {
       </section>
 
       {showData ? (
-        <section className="wf-source-panel panel">
+        <section className="wf-source-panel panel" ref={sourcePanel}>
           <div className="wf-section-head"><div><p className="eyebrow">DATA PROVENANCE</p><h2>Real source structure, focused demo subset</h2></div><span className="wf-live"><span /> Derived locally</span></div>
           <div className="wf-source-grid">
             {provenance.sourceFiles.map((file) => (
               <article key={file.kind}>
-                <span>{file.kind}</span><strong>{file.rowCount.toLocaleString()}</strong><small>{file.columns.length} source fields</small>
+                <span>{file.kind}</span><strong>{file.rowCount.toLocaleString()}</strong><small>{file.columns.length} source fields</small><code>{file.columns.slice(0, 4).join(' · ')}{file.columns.length > 4 ? ' …' : ''}</code>
               </article>
             ))}
+          </div>
+          <div className="wf-quality-grid">
+            <span><strong>{Object.values(provenance.quality.exactDuplicateCounts).reduce((sum, value) => sum + value, 0).toLocaleString()}</strong> exact duplicates identified</span>
+            <span><strong>{provenance.quality.trimmedWorkCodeCount.toLocaleString()}</strong> work codes normalized</span>
+            <span><strong>{Object.values(provenance.quality.invalidDateCounts).reduce((sum, value) => sum + value, 0).toLocaleString()}</strong> out-of-range or malformed dates quarantined</span>
           </div>
           <p className="wf-source-note">The demo packages only the records and aggregates needed for this story. Matching and calculations use the original field names and rules; age and gender never enter candidate selection.</p>
         </section>
@@ -172,8 +192,8 @@ export default function WorkforceDemo() {
 
       <ol className="wf-stepper" aria-label="Demo progress">
         {steps.map((label, index) => (
-          <li key={label} className={stage >= index ? 'active' : ''} aria-current={stage === index ? 'step' : undefined}>
-            <span>{stage > index ? <Check size={14} /> : index + 1}</span><strong>{label}</strong>
+          <li key={label} className={stepIndex >= index ? 'active' : ''} aria-current={stepIndex === index ? 'step' : undefined}>
+            <span>{stepIndex > index ? <Check size={14} /> : index + 1}</span><strong>{label}</strong>
           </li>
         ))}
       </ol>
@@ -214,13 +234,13 @@ export default function WorkforceDemo() {
           {stage === 2 ? (
             <>
               <section className="wf-result-banner">
-                <div><span className="wf-status-icon"><ShieldCheck size={22} /></span><div><p className="eyebrow">ANALYSIS COMPLETE</p><h2>Coverage can be arranged. Manager review is required.</h2><p>One rostered shift is affected and two eligible coverage options were found.</p></div></div>
+                <div><span className="wf-status-icon"><ShieldCheck size={22} /></span><div><p className="eyebrow">ANALYSIS COMPLETE</p><h2>Coverage options found. Manager review is required.</h2><p>One shift is affected. Three clinicians passed hard filters; the two strongest unit-experience examples are shown.</p></div></div>
                 <button className="button primary" onClick={() => setStage(3)}>Open manager review <ArrowRight size={16} /></button>
               </section>
               <div className="wf-metrics">
                 <article className="panel"><Clock3 /><span>Leave balance</span><strong>Unavailable</strong><small>No valid snapshot on {formatDate(provenance.decisionDate)}</small></article>
                 <article className="panel"><Hospital /><span>Affected shifts</span><strong>{scenario.affectedShifts.length}</strong><small>{shift.rosterUnit} · {shift.startTime}–{shift.endTime}</small></article>
-                <article className="panel"><Users /><span>Eligible options</span><strong>{candidates.length}</strong><small>Same role and rate, no detected conflict</small></article>
+                <article className="panel"><Users /><span>Eligible pool</span><strong>{scenario.eligibleCandidatePoolSize ?? candidates.length}</strong><small>{candidates.length} shown · same role and rate</small></article>
               </div>
               <section className="panel wf-evidence-card">
                 <div className="wf-section-head"><div><p className="eyebrow">AFFECTED ROSTER SHIFT</p><h2>{shift.rosterUnitDescription ?? 'Synthetic Emergency Department'}</h2></div><span className="wf-chip warning">Needs coordination</span></div>
@@ -233,7 +253,7 @@ export default function WorkforceDemo() {
           {stage === 3 ? (
             <section className="panel wf-manager-card">
               <div className="wf-section-head"><div><p className="eyebrow">MANAGER REVIEW</p><h2>Choose a coverage option using the evidence</h2></div><span className="wf-chip"><UserCheck size={14} /> Human decision</span></div>
-              <div className="wf-manager-summary"><div><span>Request</span><strong>{scenario.employee.employeeId} · {scenario.request.leaveType}</strong><small>{formatDate(scenario.request.startDate)} · {scenario.request.requestedHours} hours</small></div><div><span>Operational impact</span><strong>1 ED shift requires coordination</strong><small>RMO · {shift.startTime}–{shift.endTime}</small></div><div><span>Entitlement evidence</span><strong>Requires HR review</strong><small>Latest balance is after the decision date</small></div></div>
+              <div className="wf-manager-summary"><div><span>Request</span><strong>{scenario.employee.employeeId} · {scenario.request.leaveType}</strong><small>{formatDate(scenario.request.startDate)} · {scenario.request.requestedHours} hours</small></div><div><span>Operational impact</span><strong>1 ED shift requires coordination</strong><small>RMO · {shift.startTime}–{shift.endTime}</small></div><div><span>Entitlement evidence</span><strong>Requires HR review</strong><small>{scenario.balance.futureSnapshot ? `${formatDate(scenario.balance.futureSnapshot.effectiveDate)} snapshot (${scenario.balance.futureSnapshot.remainingHours.toFixed(1)} h) is after decision date and was not used` : 'No decision-date balance available'}</small></div></div>
               <h3 className="wf-subheading">Eligible coverage options <span>· showing 2 of {scenario.eligibleCandidatePoolSize ?? candidates.length}</span></h3>
               <div className="wf-candidates">
                 {candidates.map((candidate) => (
@@ -244,8 +264,10 @@ export default function WorkforceDemo() {
                   </button>
                 ))}
               </div>
-              <div className="wf-policy"><CircleHelp size={18} /><div><strong>Policy evidence is intentionally incomplete</strong><p>The supplied links name relevant policies but do not contain their rule text. Credential, fatigue and staffing-ratio checks remain unknown and visible for manager review.</p></div></div>
+              <div className="wf-policy-list">{scenario.policyChecks.map((check) => <div key={check.id ?? check.name}><span className={check.result}>{check.result}</span><div><strong>{check.name ?? check.label}</strong><p>{check.explanation}</p></div></div>)}</div>
+              <div className="wf-policy"><CircleHelp size={18} /><div><strong>Policy evidence is intentionally incomplete</strong><p>The supplied links name relevant policies but do not contain their rule text. Unknown checks stay with the manager.</p></div></div>
               <div className="wf-decision-row"><button className="button secondary" onClick={() => setDecision('changes')}>Request changes</button><button className="button primary" disabled={!selectedCandidate} onClick={() => { setDecision('approved'); setStage(4); }}>Approve and coordinate <ArrowRight size={16} /></button></div>
+              {decision === 'changes' ? <div className="wf-change-result" role="status"><Check size={16} /><div><strong>Changes requested</strong><p>This decision is recorded for the demo. In production, the employee would receive the manager’s requested changes.</p></div></div> : null}
             </section>
           ) : null}
 
@@ -255,10 +277,11 @@ export default function WorkforceDemo() {
               <div className="wf-teams-card">
                 <div className="wf-teams-head"><span>M</span><div><strong>CoverAssist</strong><small>Simulated Teams coordination</small></div></div>
                 <h3>Can you cover an RMO shift?</h3><p>{selectedCandidate}, the manager selected you as an eligible option for the following shift.</p>
-                <dl><div><dt>Unit</dt><dd>{shift.rosterUnit} · Synthetic Emergency Department</dd></div><div><dt>Date</dt><dd>{formatDate(shift.shiftDate)}</dd></div><div><dt>Time</dt><dd>{shift.startTime}–{shift.endTime} · {shift.netHours} hours</dd></div><div><dt>Capacity</dt><dd>{candidates.find((item) => item.employeeId === selectedCandidate)?.projectedPayPeriodHours} / 80 projected hours</dd></div></dl>
-                <div className="wf-card-actions"><button>Accept</button><button>Decline</button><button>Ask a question</button></div>
+                <dl><div><dt>Unit</dt><dd>{shift.rosterUnit} · Synthetic Emergency Department</dd></div><div><dt>Date</dt><dd>{formatDate(shift.shiftDate)}</dd></div><div><dt>Time</dt><dd>{shift.startTime}–{shift.endTime} · {shift.netHours} hours</dd></div><div><dt>Capacity</dt><dd>{candidates.find((item) => item.employeeId === selectedCandidate)?.projectedPayPeriodHours} / {candidates.find((item) => item.employeeId === selectedCandidate)?.contractHours} projected hours</dd></div></dl>
+                <div className="wf-card-actions"><button onClick={() => setCoordinationResponse('Accepted')}>Accept</button><button onClick={() => setCoordinationResponse('Declined')}>Decline</button><button onClick={() => setCoordinationResponse('Question sent')}>Ask a question</button></div>
+                {coordinationResponse ? <p className="wf-response" role="status"><Check size={13} /> Simulated response: {coordinationResponse}</p> : null}
               </div>
-              <div className="wf-final-actions"><button className="button secondary" onClick={resetDemo}><RefreshCcw size={15} /> Replay story</button><button className="button primary" onClick={() => setShowData(true)}><Database size={15} /> Show the data behind it</button></div>
+              <div className="wf-final-actions"><button className="button secondary" onClick={resetDemo}><RefreshCcw size={15} /> Replay story</button><button className="button primary" onClick={showDataPanel}><Database size={15} /> Show the data behind it</button></div>
             </section>
           ) : null}
         </div>
