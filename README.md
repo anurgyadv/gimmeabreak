@@ -75,3 +75,5 @@ npm run build
 ```
 
 Tests cover current-versus-future balances, overnight overlap, bilateral swaps, role/instrument restrictions, rest transitions, request reservations, declined colleague handling, submission timing and manager verification/projected rosters.
+
+The clinical manager navigation includes Staffing requirements: ten role sliders, day/evening/night windows and shift/day/fortnight bulk application. Plans persist on the current device, keyed by department and fortnight. The on-page comparison uses the imported roster snapshot; these settings do not yet change server-side chatbot checks or approval decisions. Agent workflows remains excluded from the main app.
