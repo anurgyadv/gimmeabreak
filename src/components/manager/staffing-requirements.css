@@ -30,3 +30,5 @@
 .staffing-ui .role-column.short input[type=range]::-moz-range-thumb{background:#cb8c51}
 
 .staffing-ui{min-height:0;background:transparent}.staffing-ui .period{margin-top:20px}.staffing-ui .floor-card{box-shadow:0 6px 24px #1d647608}.staffing-ui .role-column h3{margin-top:10px}.staffing-ui .isolation{margin-top:0}
+
+.staffing-ui .floor-value.unset{font-size:20px;color:#738896;min-height:64px;padding-top:14px}
