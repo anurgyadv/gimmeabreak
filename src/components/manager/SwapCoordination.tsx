@@ -17,20 +17,27 @@ const date=(value:string)=>new Date(value+'T12:00:00').toLocaleDateString('en-AU
 const shiftLabel=(shift:Shift)=>`${date(shift.date)} · ${shift.start}–${shift.end}`;
 const hours=(value:number)=>Number(value.toFixed(1));
 
-export default function SwapCoordination({booking,onUpdated}:{booking:Booking;onUpdated:(booking:Booking)=>void}){
+type Alternative = {dates:string[];hours:number;reason:string;noAdditionalCover:boolean};
+
+export default function SwapCoordination({booking,onUpdated,onDecisionDraft}:{booking:Booking;onUpdated:(booking:Booking)=>void;onDecisionDraft?:(text:string)=>void}){
  const [options,setOptions]=useState<SwapOption[]>([]);
  const [selected,setSelected]=useState(booking.swap?.id||'');
  const [loading,setLoading]=useState(true);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
+ const [declineReason,setDeclineReason]=useState('');
+ const [recordingDecline,setRecordingDecline]=useState(false);
+ const [alternatives,setAlternatives]=useState<Alternative[]>([]);
+ const [decisionDraft,setDecisionDraft]=useState('');
  const invitation=booking.swapInvitation;
  const terminal=booking.status==='approved'||booking.status==='declined';
 
  useEffect(()=>{
   const controller=new AbortController();
   let generation=0;
-  setNotice('');
+  setNotice('');setRecordingDecline(false);setDeclineReason('');
+  setAlternatives([]);setDecisionDraft('');
   const load=async()=>{
    const current=++generation;
    setLoading(true);setError('');
@@ -39,6 +46,8 @@ export default function SwapCoordination({booking,onUpdated}:{booking:Booking;on
     const result=await response.json();
     if(!response.ok)throw new Error(result.message||'Unable to load swap options.');
     if(controller.signal.aborted||current!==generation)return;
+    setAlternatives((result.alternatives||[]) as Alternative[]);
+    setDecisionDraft(typeof result.decisionDraft==='string'?result.decisionDraft:'');
     const available=(result.options||[]) as SwapOption[];
     const ordered=[...available].sort((a,b)=>Number(b.id===booking.swap?.id)-Number(a.id===booking.swap?.id));
     setOptions(ordered.slice(0,3));
@@ -53,11 +62,12 @@ export default function SwapCoordination({booking,onUpdated}:{booking:Booking;on
  },[booking.id,booking.swap?.id,booking.status,invitation?.status]);
 
  async function update(status?:'accepted'|'declined'){
+  if(status==='declined'&&!declineReason.trim()){setError('Add the colleague’s reason before recording a decline.');return;}
   setBusy(true);setError('');setNotice('');
   try{
    const response=await fetch('/api/chat/swaps',{
     method:status?'PATCH':'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(status?{requestId:booking.id,status}:{requestId:booking.id,swapId:selected})
+    body:JSON.stringify(status?{requestId:booking.id,status,...(status==='declined'?{reason:declineReason.trim()}:{})}:{requestId:booking.id,swapId:selected})
    });
    const result=await response.json();
    if(!response.ok)throw new Error(result.message||'Unable to update the swap invitation.');
@@ -80,7 +90,25 @@ export default function SwapCoordination({booking,onUpdated}:{booking:Booking;on
    </article>)}</div>:!error&&<p className="swap-muted">No current swap options found. Review alternative leave dates or arrange cover separately.</p>}
    {choice&&!terminal&&invitation?.status!=='pending'&&invitation?.status!=='accepted'&&<button className="wf-primary swap-send" disabled={busy||choice.checks.some(check=>check.status==='fail')} onClick={()=>void update()}>{busy?<LoaderCircle size={16}/>:<Send size={16}/>}Send swap invitation to {name(choice.employeeId)}</button>}
   </>}
-  {invitation&&<div className="swap-inbox"><div className="swap-heading"><h4>Colleague inbox preview</h4><span>{invitation.status==='pending'?'Awaiting response':invitation.status==='accepted'?'Acceptance recorded':'Decline recorded'}</span></div><p><b>To {name(invitation.recipientId)}</b></p><blockquote>{invitation.message}</blockquote><small>Saved in this app. No external email or Teams message is sent.</small>{invitation.status==='pending'&&!terminal&&<><p className="swap-response-note">After speaking with the colleague, record their response below. This is a manager-recorded response.</p><div className="swap-response-actions"><button className="wf-secondary" disabled={busy} onClick={()=>void update('accepted')}>Record acceptance</button><button className="wf-secondary" disabled={busy} onClick={()=>void update('declined')}>Record decline</button></div></>}{invitation.status==='accepted'&&<p className="swap-response-note">The manager has recorded acceptance. Final leave approval is still required.</p>}</div>}
+  {invitation&&<div className="swap-inbox">
+   <div className="swap-heading"><h4>Colleague response</h4><span>{invitation.status==='pending'?'Awaiting response':invitation.status==='accepted'?'Accepted':'Declined'}</span></div>
+   <p><b>To {name(invitation.recipientId)}</b></p>
+   <a className="swap-teams-link" href={`/teams-preview?requestId=${encodeURIComponent(booking.id)}`} target="_blank" rel="noopener noreferrer">Open Teams preview ↗</a>
+   <small className="swap-preview-note">An interactive in-app preview. No external Teams message is sent.</small>
+   <details className="swap-message-details"><summary>View invitation message</summary><blockquote>{invitation.message}</blockquote></details>
+   {invitation.status==='pending'&&!terminal&&<>
+    <p className="swap-response-note">Use the preview as the colleague, or record their response after speaking with them.</p>
+    <div className="swap-response-actions"><button className="wf-secondary" disabled={busy} onClick={()=>void update('accepted')}>Record acceptance</button><button className="wf-secondary" disabled={busy} onClick={()=>setRecordingDecline(value=>!value)}>{recordingDecline?'Cancel decline':'Record decline'}</button></div>
+    {recordingDecline&&<div className="swap-decline-form"><label htmlFor={`swap-decline-${booking.id}`}>Colleague’s reason</label><textarea id={`swap-decline-${booking.id}`} value={declineReason} onChange={event=>setDeclineReason(event.target.value)} maxLength={500} rows={2} placeholder="Why can’t they take this shift?" disabled={busy}/><button className="wf-secondary" disabled={busy||!declineReason.trim()} onClick={()=>void update('declined')}>Save decline and reason</button></div>}
+   </>}
+   {invitation.status==='accepted'&&<p className="swap-response-note">{invitation.responseSource==='teams-preview'?'The colleague accepted in the Teams preview.':'The manager recorded the colleague’s acceptance.'} Final leave approval is still required.</p>}
+   {invitation.status==='declined'&&<div className="swap-decline-outcome">
+    <p><b>Reason:</b> {invitation.reason||'No reason was recorded.'}</p>
+    <p className="swap-response-note">{invitation.responseSource==='teams-preview'?'Response received through the Teams preview.':'Response recorded by the manager.'} The leave request is still yours to decide. Find other cover, or explain a decline and offer alternative dates.</p>
+    {decisionDraft&&<div className="swap-decision-draft"><h4>Suggested manager response</h4><p>{decisionDraft}</p>{onDecisionDraft&&!terminal&&<button className="wf-secondary" onClick={()=>onDecisionDraft(decisionDraft)}>Use this reason</button>}</div>}
+    {alternatives.length>0&&<div className="swap-alternatives"><h4>Alternative dates</h4>{alternatives.map((alternative,index)=><div className="swap-alternative" key={`${alternative.dates.join('-')}-${index}`}><strong>{alternative.dates.map(date).join(' · ')}</strong><span>{hours(alternative.hours)}h · {alternative.noAdditionalCover?'Checked: no additional cover needed':'Needs staffing review'}</span><p>{alternative.reason}</p></div>)}</div>}
+   </div>}
+  </div>}
   {error&&<p className="wf-error" role="alert">{error}</p>}
   {notice&&<p className="swap-notice" role="status">{notice}</p>}
  </section>;

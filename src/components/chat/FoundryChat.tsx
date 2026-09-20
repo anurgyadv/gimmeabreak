@@ -4,6 +4,7 @@ import {useCallback, useEffect, useId, useRef, useState} from 'react';
 import {ArrowUp, Check, ChevronDown, Leaf, LoaderCircle, LockKeyhole, MessageCircle, RefreshCw, ShieldCheck, Square, X} from 'lucide-react';
 import './foundry-chat.css';
 import ChatAnswer from './ChatAnswer';
+import AlternativeCalendar, {parseAlternativeDates, type AlternativeDates} from './AlternativeCalendar';
 import type {SwapOption} from '@/lib/workforce-types';
 
 type Status = {configured:boolean; authenticated?:boolean; accessRequired:boolean; role?:'employee'|'manager'|null; model?:string; message?:string};
@@ -14,7 +15,7 @@ type ChatAction = {id:string;label:string;prompt?:string;kind?:'prompt'|'watch';
 type Followup = ChatAction | {id:string;label:string;kind:'dates'};
 type Watch = {id:string;dates:string[]};
 type SwapChoice={employeeName:string;option:SwapOption;proposal:Proposal};
-type Message = {id:string; role:'user'|'assistant'; content:string; activities?:Activity[]; citations?:Citation[]; proposals?:Proposal[]; actions?:ChatAction[]; canProceed?:boolean; requestText?:string;swapChoices?:SwapChoice[]};
+type Message = {id:string; role:'user'|'assistant'; content:string; activities?:Activity[]; citations?:Citation[]; proposals?:Proposal[]; actions?:ChatAction[]; canProceed?:boolean; requestText?:string;swapChoices?:SwapChoice[];alternatives?:AlternativeDates};
 type StreamEvent = {type:string; name?:string; label?:string; summary?:string; text?:string; message?:string; citations?:Citation[]; actionProposal?:Proposal; actions?:ChatAction[]; swapChoices?:SwapChoice[]; data?:{actionProposal?:Proposal;canProceed?:boolean;assessment?:{canProceed?:boolean}}};
 const MIN_DATE='2026-09-21',MAX_DATE='2026-10-04';
 const validDate=(date:unknown):date is string=>typeof date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&date>=MIN_DATE&&date<=MAX_DATE;
@@ -108,7 +109,7 @@ export default function FoundryChat({manager=false}:{manager?:boolean}) {
         if(index>=0)activities[index]=result;else activities.push(result);
         const candidate=item.actionProposal||item.data?.actionProposal;
         const proposal=candidate?.type==='submit_request'&&typeof candidate.id==='string'&&typeof candidate.description==='string'?candidate:null;
-        return {...m,activities,swapChoices:item.swapChoices||m.swapChoices,actions:mergeActions(m.actions,item.actions),canProceed:item.data?.assessment?.canProceed??item.data?.canProceed??m.canProceed,proposals:proposal?[...(m.proposals||[]).filter(p=>p.id!==proposal.id),proposal]:m.proposals};
+        return {...m,activities,alternatives:item.name==='find_alternative_dates'?parseAlternativeDates(item.data)||m.alternatives:m.alternatives,swapChoices:item.swapChoices||m.swapChoices,actions:mergeActions(m.actions,item.actions),canProceed:item.data?.assessment?.canProceed??item.data?.canProceed??m.canProceed,proposals:proposal?[...(m.proposals||[]).filter(p=>p.id!==proposal.id),proposal]:m.proposals};
       });
       if(item.type==='answer')update(answerId,m=>({...m,content:m.content+(item.text||''),citations:item.citations||m.citations,actions:mergeActions(m.actions,item.actions)}));
       if(item.type==='error'){failed=true;setError(item.message||'The assistant could not complete this request.');}
@@ -148,6 +149,7 @@ export default function FoundryChat({manager=false}:{manager?:boolean}) {
             {messages.map(message=><article key={message.id} className={`fc-message ${message.role}`}><span className="fc-author">{message.role==='user'?'You':'GimmeABreak'}</span>
               {!!message.activities?.length&&<details className="fc-activity"><summary><ShieldCheck size={15}/>{message.activities.filter(a=>a.complete).length} of {message.activities.length} checks complete<ChevronDown size={14}/></summary>{message.activities.map((activity,i)=><div key={`${activity.name}-${i}`}>{activity.complete?<Check size={15}/>:busy?<LoaderCircle className="fc-spin" size={15}/>:<Square size={13}/>}<span><strong>{activity.label}</strong>{activity.summary&&<small>{activity.summary}</small>}</span></div>)}</details>}
               {message.content&&<ChatAnswer text={message.content}/>}
+              {message.alternatives&&<AlternativeCalendar data={message.alternatives} disabled={!ready||busy||!!confirming} onCheck={prompt=>void send(prompt)}/>}
               {message.swapChoices?.map(({option:o,proposal,employeeName})=><section className="fc-proposal" key={o.id}><strong>{o.kind==='swap'?'Shift swap':'Shift cover'} · {employeeName}</strong><ul><li>They work: {dateLabel(o.outgoing.date)} · {o.outgoing.start}–{o.outgoing.end}</li><li>{o.returnShift?`You work: ${dateLabel(o.returnShift.date)} · ${o.returnShift.start}–${o.returnShift.end}`:'Their existing shifts stay unchanged.'}</li><li>Same role and grade · rest and roster conflicts checked.</li></ul><details><summary>Requirements checked</summary><ul>{o.checks.map(c=><li key={c.id}><b>{c.label}:</b> {c.detail}</li>)}</ul></details><small>Manager review and colleague agreement required.</small>{proposal.state?<p>{proposal.state==='confirmed'?'Saved with your request. Your manager can invite this colleague.':'Another option was selected.'}</p>:<button className="fc-primary" disabled={busy||!!confirming} onClick={()=>void confirm(message.id,proposal)}>{confirming===proposal.id?'Submitting…':'Confirm & send this option to manager'}</button>}</section>)}
               {message.role==='assistant'&&!message.content&&busy&&message.id===messages.at(-1)?.id&&<p className="fc-working"><LoaderCircle className="fc-spin" size={15}/>{message.activities?.filter(a=>!a.complete).at(-1)?.label||'Working on your question…'}</p>}
               {!!message.citations?.length&&<div className="fc-sources">{message.citations.map((citation,i)=>{const href=safeUrl(citation.url);return href?<a key={`${href}-${i}`} href={href} target="_blank" rel="noopener noreferrer">{citation.title} ↗</a>:null;})}</div>}

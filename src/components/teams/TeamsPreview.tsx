@@ -1,244 +1,61 @@
 'use client';
-
-import { useState } from 'react';
-import Link from 'next/link';
-import {
-  CheckCircle2,
-  Loader2,
-  MessageCircleQuestion,
-  MessagesSquare,
-  ShieldCheck,
-  Sparkles,
-  SquareArrowOutUpRight,
-  XCircle,
-} from 'lucide-react';
-import { useDemo } from '@/lib/demo-context';
+import {useCallback,useEffect,useState} from 'react';
+import {ArrowLeft,Bell,CalendarDays,Check,ChevronDown,Clock3,Grid2X2,MessageSquare,MoreHorizontal,RefreshCw,Search,ShieldCheck,Users,X} from 'lucide-react';
+import type {Booking,Shift,SwapOption} from '@/lib/workforce-types';
 import './teams.css';
 
-const REQUESTER_NAME = 'Dr Anurag Rao';
-const WARD_NAME = 'General Medicine';
-const SHIFT_LABEL = 'Day · 08:00–16:00';
-const DEEP_LINK_HREF = '/planner?host=teams&subEntityId=leave-eval-1820';
-
-const SIMULATED_REPLY =
-  'This is a simulated response — in production this would route to a live conversation in Microsoft Teams.';
-
-export default function TeamsPreview() {
-  const { evaluation, coverRequest, revalidation, options, teamsUnavailable, respond, revalidate, busy } = useDemo();
-  const [askOpen, setAskOpen] = useState(false);
-  const [draftQuestion, setDraftQuestion] = useState('');
-  const [asked, setAsked] = useState(false);
-
-  const isBusy = busy !== null;
-
-  if (!coverRequest) {
-    return (
-      <div className="tp-shell">
-        <HostHeader unavailable={teamsUnavailable} />
-        <div className="tp-empty panel">
-          <p>No cover request has been sent yet.</p>
-          <p className="muted">Resolve a leave evaluation from the planner to see the {teamsUnavailable ? 'cover inbox' : 'Teams'} preview.</p>
-          <Link className="button primary" href="/planner">
-            Go to planner
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const matchedOption = options.find((option) => option.id === coverRequest.optionId);
-  const currentRevalidation = revalidation && revalidation.coverRequestId === coverRequest.id ? revalidation : null;
-  const restCompliant = matchedOption ? matchedOption.restCompliant : true;
-  const overtimeHours = matchedOption ? matchedOption.overtimeHours : 0;
-  const dateLabel = evaluation ? `${evaluation.startDate} – ${evaluation.endDate}` : 'the requested dates';
-
-  return (
-    <div className="tp-shell">
-      <HostHeader unavailable={teamsUnavailable} />
-
-      <div className="tp-persona">
-        <span className="avatar" aria-hidden="true">
-          SL
-        </span>
-        <div className="tp-persona-meta">
-          <p className="tp-persona-name">Dr Sarah Lee</p>
-          <p className="tp-persona-sub">General Medicine · Senior clinician</p>
-        </div>
-      </div>
-
-      <div className="tp-conversation">
-        <div className="tp-bubble">
-          <span className="tp-bubble-app">
-            <Sparkles size={13} aria-hidden="true" />
-            CoverAssist
-          </span>
-
-          <h2 className="tp-card-title">Shift cover request</h2>
-          <p className="tp-card-body">
-            {REQUESTER_NAME} is looking for cover on {dateLabel}.
-          </p>
-
-          <div className="tp-facts">
-            <Fact label="Ward" value={WARD_NAME} />
-            <Fact label="Shift" value={SHIFT_LABEL} />
-            <Fact label="Overtime" value={overtimeHours === 0 ? 'None' : `${overtimeHours}h`} />
-            <Fact label="Rest check" value={restCompliant ? 'Satisfied' : 'Needs review'} />
-          </div>
-
-          {coverRequest.personalNote && (
-            <div>
-              <p className="tp-note-label">Personal note</p>
-              <p className="tp-note-text">&ldquo;{coverRequest.personalNote}&rdquo;</p>
-            </div>
-          )}
-
-          {coverRequest.status === 'sent' && (
-            <div className="tp-actions">
-              <button type="button" className="button primary" disabled={isBusy} onClick={() => void respond('accepted')}>
-                {isBusy ? <Loader2 size={15} className="tp-spin" aria-hidden="true" /> : <CheckCircle2 size={15} aria-hidden="true" />}
-                Accept
-              </button>
-              <button type="button" className="button secondary" disabled={isBusy} onClick={() => void respond('declined')}>
-                <XCircle size={15} aria-hidden="true" />
-                Decline
-              </button>
-              <button type="button" className="button ghost" onClick={() => setAskOpen((value) => !value)}>
-                <MessageCircleQuestion size={15} aria-hidden="true" />
-                Ask a question
-              </button>
-            </div>
-          )}
-
-          {coverRequest.status !== 'sent' && (
-            <div className="tp-actions">
-              <button type="button" className="button ghost" onClick={() => setAskOpen((value) => !value)}>
-                <MessageCircleQuestion size={15} aria-hidden="true" />
-                Ask a question
-              </button>
-            </div>
-          )}
-
-          <p className="tp-caption">
-            <ShieldCheck size={13} aria-hidden="true" />
-            Prototype of the Teams Adaptive Card workflow.
-          </p>
-        </div>
-
-        {askOpen && (
-          <div className="tp-support" role="group" aria-label="Ask a question (simulated)">
-            <span className="tp-support-label">Simulated support thread</span>
-            <textarea
-              className="tp-textarea"
-              rows={2}
-              placeholder="Type a question for Sarah…"
-              value={draftQuestion}
-              onChange={(event) => setDraftQuestion(event.target.value)}
-            />
-            <div className="tp-actions">
-              <button
-                type="button"
-                className="button secondary"
-                onClick={() => setAsked(true)}
-                disabled={draftQuestion.trim().length === 0}
-              >
-                Send question (simulated)
-              </button>
-            </div>
-            {asked && <p className="muted">{SIMULATED_REPLY}</p>}
-          </div>
-        )}
-
-        {coverRequest.status === 'accepted' && (
-          <div className="tp-panel" data-tone="positive">
-            <div className="tp-panel-head">
-              <CheckCircle2 size={16} aria-hidden="true" />
-              Sarah accepted
-            </div>
-            <p className="muted">Revalidate the roster to confirm the leave is now feasible.</p>
-            <div className="tp-actions">
-              <button type="button" className="button primary" disabled={isBusy} onClick={() => void revalidate()}>
-                {isBusy ? <Loader2 size={15} className="tp-spin" aria-hidden="true" /> : <ShieldCheck size={15} aria-hidden="true" />}
-                Revalidate roster
-              </button>
-            </div>
-          </div>
-        )}
-
-        {coverRequest.status === 'revalidated' && currentRevalidation && (
-          <div className="tp-panel" data-tone="positive">
-            <div className="tp-panel-head">
-              <ShieldCheck size={16} aria-hidden="true" />
-              Roster revalidated
-            </div>
-            <p className="muted">
-              Feasibility {currentRevalidation.beforeScore} &rarr; {currentRevalidation.afterScore}
-            </p>
-            <ul className="tp-checks">
-              {currentRevalidation.checks.map((check) => (
-                <li key={check.ruleId} className="tp-check">
-                  {check.passed ? <CheckCircle2 size={14} aria-hidden="true" /> : <XCircle size={14} aria-hidden="true" />}
-                  {check.label}
-                </li>
-              ))}
-            </ul>
-            <div className="tp-actions">
-              <Link className="button primary" href="/manager">
-                Continue to manager approval
-              </Link>
-              <Link className="button ghost" href="/planner">
-                Back to planner
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {coverRequest.status === 'declined' && (
-          <div className="tp-panel" data-tone="warn">
-            <div className="tp-panel-head">
-              <XCircle size={16} aria-hidden="true" />
-              Sarah declined
-            </div>
-            <p className="muted">This request cannot be revalidated. Choose another way forward from the planner.</p>
-            <div className="tp-actions">
-              <Link className="button primary" href="/planner">
-                Return to planner
-              </Link>
-              <Link className="button secondary" href="/planner">
-                Try alternative
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="tp-deep-link">
-        <span className="muted">Adaptive Card action: Open Leave Planner</span>
-        <Link className="button secondary" href={DEEP_LINK_HREF}>
-          <SquareArrowOutUpRight size={15} aria-hidden="true" />
-          Open in Teams host
-        </Link>
-      </div>
-    </div>
-  );
+type PreviewRequest={booking:Booking;recipientName:string;impact:{hoursBefore:number;hoursAfter:number;contractHours:number;restBeforeHours:number|null;restAfterHours:number|null;minimumRestHours:number|null;restBeforeMinimumHours:number|null;restAfterMinimumHours:number|null};replyToken:string|null};
+type InvitationSnapshot=NonNullable<Booking['swapInvitation']>&{option?:SwapOption;reason?:string};
+const number=(n:number)=>new Intl.NumberFormat('en-AU',{maximumFractionDigits:1}).format(n);
+const date=(value:string)=>new Date(`${value.slice(0,10)}T12:00:00`).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+const time=(value:string)=>value.includes('T')?value.split('T')[1].slice(0,5):value.slice(0,5);
+const rest=(n:number|null)=>n===null?'Not recorded':`${number(n)}h`;
+function ShiftBlock({shift,label,tone}:{shift:Shift;label:string;tone:'take'|'give'}){
+ return <div className={`tp-shift tp-shift-${tone}`}><span>{label}</span><strong>{date(shift.date)}</strong><div>{time(shift.start)}–{time(shift.end)} · {number(shift.netHours)}h</div><small>{shift.unitName.replace(/^SU\d+\s*[–—-]?\s*/i,"").replace(/synthetic\s*/ig,"")}</small></div>;
 }
-
-function HostHeader({ unavailable }: { unavailable: boolean }) {
-  return (
-    <div className="tp-host" data-unavailable={unavailable}>
-      <div className="tp-host-left">
-        <MessagesSquare size={16} aria-hidden="true" />
-        {unavailable ? 'Cover Inbox' : 'Microsoft Teams'}
-      </div>
-      <span className="tp-host-badge">{unavailable ? 'Teams unavailable · internal fallback' : 'Simulated host'}</span>
-    </div>
-  );
-}
-
-function Fact({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="tp-fact-label">{label}</p>
-      <p className="tp-fact-value">{value}</p>
-    </div>
-  );
+export default function TeamsPreview(){
+ const [requests,setRequests]=useState<PreviewRequest[]>([]),[selected,setSelected]=useState(''),[loading,setLoading]=useState(true),[error,setError]=useState(''),[busy,setBusy]=useState(false),[reply,setReply]=useState<'accepted'|'declined'|null>(null),[reason,setReason]=useState('');
+ const refresh=useCallback(async(bootstrap=false)=>{
+  setError('');setLoading(true);
+  try{
+   if(bootstrap){const session=await fetch('/api/chat/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role:'manager'})});if(!session.ok)throw new Error('Could not open the preview. Please try again.');}
+   const requestId=new URLSearchParams(window.location.search).get('requestId');
+   const response=await fetch(`/api/teams-preview${requestId?`?requestId=${encodeURIComponent(requestId)}`:''}`,{cache:'no-store'});
+   const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not load invitations.');
+   const next:PreviewRequest[]=data.requests||[];setRequests(next);setSelected(current=>next.some(r=>r.booking.id===current)?current:next[0]?.booking.id||'');
+  }catch(e){setError(e instanceof Error?e.message:'Could not load invitations.');}finally{setLoading(false);}
+ },[]);
+ useEffect(()=>{void refresh(true)},[refresh]);
+ const current=requests.find(r=>r.booking.id===selected),booking=current?.booking,invitation=booking?.swapInvitation as InvitationSnapshot|undefined,option=booking?.swap||invitation?.option;
+ const canReply=!!current?.replyToken&&invitation?.status==='pending';
+ async function sendReply(){
+  if(!current?.replyToken||!reply||(reply==='declined'&&!reason.trim()))return;
+  setBusy(true);setError('');
+  try{const response=await fetch('/api/teams-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:current.replyToken,status:reply,reason:reason.trim()})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not send your response.');setReply(null);setReason('');await refresh();}
+  catch(e){setError(e instanceof Error?e.message:'Could not send your response.');}finally{setBusy(false);}
+ }
+ return <div className="tp-shell">
+  <div className="tp-preview-note"><span>Teams preview · simulated colleague response</span><a href="/#manager-requests"><ArrowLeft size={14}/> Back to manager</a></div>
+  <header className="tp-topbar"><div className="tp-wordmark"><Grid2X2 size={20}/><strong>Teams</strong></div><div className="tp-search"><Search size={17}/><span>Search in Teams</span></div><div className="tp-self" aria-label="Colleague preview">{(current?.recipientName||'Colleague').split(' ').map(s=>s[0]).slice(0,2).join('')}</div></header>
+  <div className="tp-layout">
+   <nav className="tp-rail" aria-label="Preview app navigation"><span><Bell/><small>Activity</small></span><span className="tp-rail-active"><MessageSquare/><small>Chat</small></span><span><Users/><small>Teams</small></span><span><CalendarDays/><small>Calendar</small></span><span><MoreHorizontal/><small>More</small></span></nav>
+   <aside className="tp-sidebar"><div className="tp-sidebar-title"><h1>Chat</h1><MoreHorizontal size={20}/></div><div className="tp-chat-filters"><span className="tp-filter-active">All</span><span>Unread</span><span>Chats</span></div><p className="tp-favourites"><ChevronDown size={14}/> Favourites</p><div className="tp-chat-selected"><div className="tp-bot-avatar">g!</div><div><strong>GimmeABreak</strong><small>Shift swap invitations</small></div>{requests.filter(r=>r.booking.swapInvitation?.status==='pending').length>0&&<span className="tp-count">{requests.filter(r=>r.booking.swapInvitation?.status==='pending').length}</span>}</div><p className="tp-sidebar-caption">Your leave coordination assistant</p><div className="tp-sidebar-bottom">Preview only. No message is sent through Microsoft Teams.</div></aside>
+   <section className="tp-conversation" aria-label="GimmeABreak conversation"><header className="tp-conversation-header"><div className="tp-bot-avatar">g!</div><div><strong>GimmeABreak</strong><small>{current?`Chat with ${current.recipientName}`:'Leave coordination'}</small></div><button type="button" aria-label="Refresh invitations" disabled={loading||busy} onClick={()=>void refresh()}><RefreshCw size={18}/></button></header>
+    {requests.length>1&&<div className="tp-recipient-picker"><label htmlFor="tp-invitation">Viewing invitation for</label><select id="tp-invitation" value={selected} onChange={e=>{setSelected(e.target.value);setReply(null);setReason('');setError('')}}>{requests.map(r=><option key={r.booking.id} value={r.booking.id}>{r.recipientName} · {date(r.booking.dates[0])} · {r.booking.swapInvitation?.status}</option>)}</select></div>}
+    <main className="tp-messages">
+     {error&&<div className="tp-error" role="alert">{error}<button type="button" disabled={busy} onClick={()=>void refresh(true)}>Try again</button></div>}
+     {loading&&!current?<div className="tp-empty" role="status"><RefreshCw size={25}/><h2>Loading invitations…</h2></div>:!current?<div className="tp-empty"><MessageSquare size={36}/><h2>No shift invitations yet</h2><p>Send a swap invitation from a leave request in the manager view. It will appear here for the colleague to respond.</p><a className="tp-primary-link" href="/#manager-requests">Open leave requests</a></div>:<>
+      <div className="tp-day-divider"><span>{invitation?date(invitation.createdAt):'Shift invitation'}</span></div>
+      <div className="tp-message"><div className="tp-bot-avatar tp-message-avatar">g!</div><div className="tp-message-body"><div className="tp-message-meta"><strong>GimmeABreak</strong><span>Leave assistant</span></div><article className="tp-card"><div className="tp-card-intro"><span className="tp-card-kicker">SHIFT {option?.kind==='cover'?'COVER':'SWAP'} REQUEST</span><h2>Could you help cover a shift?</h2><p>Hi {current.recipientName}, your manager has sent you a shift invitation.</p></div>
+       {invitation?.message&&<p className="tp-invitation-text">{invitation.message}</p>}
+       {option&&<div className="tp-shifts"><ShiftBlock shift={option.outgoing} label="You would work" tone="take"/>{option.returnShift?<ShiftBlock shift={option.returnShift} label="Your colleague would work" tone="give"/>:<div className="tp-shift tp-shift-give"><span>Cover arrangement</span><strong>No return shift</strong><small>This adds the requested shift to your roster.</small></div>}</div>}
+       <section className="tp-impact"><h3><Clock3 size={17}/> What changes for you</h3><div className="tp-hours"><span>Fortnight hours</span><strong>{number(current.impact.hoursBefore)}h <span>→</span> {number(current.impact.hoursAfter)}h</strong><small>Contracted hours: {number(current.impact.contractHours)}h</small></div><div className="tp-rest"><div><span>Rest before the shift</span><strong>{rest(current.impact.restBeforeHours)}</strong><small>{current.impact.restBeforeMinimumHours===null?"Minimum needs verification":`${number(current.impact.restBeforeMinimumHours)}h minimum check`}</small></div><div><span>Rest after the shift</span><strong>{rest(current.impact.restAfterHours)}</strong><small>{current.impact.restAfterMinimumHours===null?"Minimum needs verification":`${number(current.impact.restAfterMinimumHours)}h minimum check`}</small></div></div><small className="tp-rest-note">Conservative rule checks; manager must verify the applicable rest requirements.</small></section>
+       {option&&<details className="tp-checks"><summary><ShieldCheck size={17}/> Requirements & checks <ChevronDown size={15}/></summary><ul>{option.checks.map(check=><li key={check.id}><span className={`tp-check-dot tp-check-${check.status}`}/><div><strong>{check.label}</strong><p>{check.detail}</p></div></li>)}</ul>{option.unresolved.length>0&&<div className="tp-unresolved"><strong>Manager to verify</strong><ul>{option.unresolved.map((item,i)=><li key={i}>{item}</li>)}</ul></div>}</details>}
+       {invitation?.status==='pending'?<div className="tp-response"><p>Your response goes to the manager. Leave still needs their approval.</p>{!reply?<div className="tp-actions"><button className="tp-accept" type="button" disabled={!canReply||busy} onClick={()=>setReply('accepted')}><Check size={17}/> Accept shift</button><button className="tp-decline" type="button" disabled={!canReply||busy} onClick={()=>setReply('declined')}><X size={17}/> Decline</button></div>:<form onSubmit={e=>{e.preventDefault();void sendReply()}}><label htmlFor="tp-reason">{reply==='declined'?'Why can’t you take this shift?':'Add a note for your manager (optional)'}</label><textarea id="tp-reason" maxLength={1000} rows={3} required={reply==='declined'} value={reason} onChange={e=>setReason(e.target.value)} placeholder={reply==='declined'?'e.g. I have a commitment after my existing shift.':'Anything your manager should know…'}/><div className="tp-actions"><button className={reply==='accepted'?'tp-accept':'tp-decline'} type="submit" disabled={busy||!canReply||(reply==='declined'&&!reason.trim())}>{busy?'Sending…':reply==='accepted'?'Confirm acceptance':'Send decline & reason'}</button><button type="button" disabled={busy} onClick={()=>{setReply(null);setReason('')}}>Cancel</button></div></form>}{!canReply&&<small>This invitation is no longer open for a response. Refresh to see its latest status.</small>}</div>:<div className={`tp-response-result tp-result-${invitation?.status}`}><strong>{invitation?.status==='accepted'?<Check size={18}/>:<X size={18}/>} {invitation?.status==='accepted'?'You accepted this shift':'You declined this shift'}</strong>{invitation?.reason&&<p>{invitation.reason}</p>}<small>{invitation?.status==='accepted'?'Your manager can now review the request and approve the leave.':'Your reason has been sent to the manager for their decision and alternative dates.'}</small><a href="/#manager-requests">Continue in manager view →</a></div>}
+      </article></div></div>
+     </>}
+    </main><footer className="tp-conversation-footer"><MessageSquare size={16}/><span>Respond using the invitation buttons above.</span></footer>
+   </section>
+  </div>
+ </div>;
 }

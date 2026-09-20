@@ -1,2 +1,2 @@
-import GimmeApp from '@/components/gimme/GimmeApp';
-export default function TeamsPage() { return <GimmeApp initialView="coverage" />; }
+import TeamsPreview from '@/components/teams/TeamsPreview';
+export default function TeamsPage() { return <TeamsPreview />; }

@@ -18,3 +18,11 @@ The September 20 walkthrough uses fresh request/invitation Azure partitions (`re
 For swaps, select a chat option and confirm it for review. The manager can send an in-app invitation, inspect the recipient inbox preview, and record acceptance/decline after speaking with the colleague. There is no colleague authentication or external messaging connection.
 
 The cancellation watch is a visual preview; it does not send scheduled notifications. Colleague agreement previews are not actual outreach. Staffing and policy detail remains available in expandable sections.
+
+## Teams-style colleague response
+
+From a manager request, send a swap invitation and select **Open Teams preview**. The separate page reads the saved invitation and shows the colleague's proposed duties, fortnight hours, and recorded rest gaps. Accept returns the request to manager review; Decline requires a reason. In manager view, use or edit the suggested response and review alternatives before deciding. The clinician sees the manager's reason and suggested dates in My requests.
+
+This is an interactive simulation of a Teams message. No Microsoft Teams account, notification, or external message is involved. Replies are scoped to the current invitation and recorded as simulated colleague responses.
+
+In chat, choose **Try different dates** to see the fortnight calendar. Green means all affected configured staffing floors pass; amber means staffing review is still required. Select a suggested block and choose **Check these dates** to recheck it. Green never means automatically approved.
