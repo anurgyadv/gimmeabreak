@@ -7,3 +7,10 @@ describe('leave outcome guidance',()=>{
  it('offers a cosmetic watch only for overlapping booked leave with affected shifts',()=>{const r=guidanceForAssessment({...base,shifts:[{date:'2026-09-21'} as never]},['2026-09-21'],[{date:'2026-09-21',count:2}]);expect(r.actions.find(a=>a.kind==='watch')?.dates).toEqual(['2026-09-21']);expect(r.reasons.join(' ')).toContain('does not establish');expect(r.status).toBe('review')});
  it('does not let staffing suggestions hide a hard balance failure',()=>{const r=guidanceForAssessment({...base,canProceed:false,checks:[{id:'balance',label:'Balance',status:'fail',detail:'Not enough balance',source:'Balances'}]},['2026-09-21'],[]);expect(r.status).toBe('changes');expect(r.reasons[0]).toBe('Not enough balance');expect(r.actions.some(a=>a.id==='prepare')).toBe(false)});
 });
+
+it('scripts an explicit balance pass and numbered staffing shortfall without claiming approval',()=>{
+ const result=guidanceForAssessment({...base,checks:[{id:'balance',label:'Balance',status:'pass',detail:'129.09h available · 8h requested',source:'Balances'},{id:'staffing-floor',label:'21 September Day',status:'warning',detail:'Registered Nurse: 11 required; 10 after leave. 1 additional clinician required.',source:'Manager floor'}]},['2026-09-21'],[]);
+ expect(result.reasons[0]).toBe('You have enough leave. 129.09h available · 8h requested');
+ expect(result.title).toBe('Your leave needs cover');expect(result.status).toBe('changes');
+ expect(result.reasons[1]).toContain('11 required; 10 after leave');
+});

@@ -24,11 +24,11 @@ export async function assessWithGuidance(dates:string[],leaveCode:string,request
  }
  const staffing=staffingImpact(dates,requests,await getStaffingFloors());
  const shortages=staffing.filter(s=>s.shortfall!==null&&s.shortfall>0);
- for(const s of staffing)assessment.checks.push({id:'staffing-floor',label:`${s.date} · ${s.band} · ${s.role}`,status:s.minimum===null||s.shortfall?'warning':'pass',detail:s.minimum===null?`No manager staffing minimum is configured for ${s.role} on ${s.date} (${s.band}). Coverage cannot yet be confirmed.`:`Your employee type (${s.role}) needs at least ${s.minimum} on ${s.date} (${s.band}). Rostered coverage: ${s.before}; after your leave: ${s.after}.${s.shortfall?` ${s.shortfall} additional clinician(s) required; this cannot be directly granted without resolving coverage.`:' The configured minimum is maintained; no additional cover is needed for this window.'}`,source:'Manager-defined operating floors; roster and recorded/pending leave'});
+ for(const s of staffing)assessment.checks.push({id:'staffing-floor',label:`${s.date} · ${s.band} · ${s.role}`,status:s.minimum===null||s.shortfall?'warning':'pass',detail:s.minimum===null?`No manager staffing minimum is configured for ${s.role} on ${s.date} (${s.band}). Coverage cannot yet be confirmed.`:`${s.date} · ${s.band} · ${s.role}: at least ${s.minimum} required; ${s.before} rostered → ${s.after} after your leave.${s.shortfall?` Short by ${s.shortfall}: ${s.shortfall} additional clinician(s) required.`:' The configured minimum is maintained; no additional cover is needed for this window.'}`,source:'Manager-defined operating floors; roster and recorded/pending leave'});
  assessment.reasons=assessment.checks.filter(c=>c.status!=='pass').map(c=>c.detail);
  if(shortages.length)assessment.summary='Cover is required before this leave can be granted';
  const guidance=guidanceForAssessment(assessment,dates,bookedDepartmentAbsences(dates),leaveCode);
- guidance.reasons.unshift(...assessment.checks.filter(c=>c.id==='staffing-floor'&&c.status==='warning').map(c=>c.detail));
+
  if(shortages.length){guidance.title='Your leave needs cover';guidance.subtitle='The request can go to your manager, but the staffing shortfall must be resolved.'}
  return{assessment,guidance,staffing};
 }
