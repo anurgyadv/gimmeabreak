@@ -48,7 +48,7 @@ export default function FoundryChat({manager=false}:{manager?:boolean}) {
   const request = useRef<AbortController|null>(null), accessRequest = useRef<AbortController|null>(null), actionRequest = useRef<AbortController|null>(null), statusRequest = useRef<AbortController|null>(null), sending = useRef(false);
   const headingId=useId(), codeId=useId(), inputId=useId();
   const role=manager?'manager':'employee';
-  const watchKey=`gimme:watch-preview:${role}:SYN008078`;
+  const watchKey=`gimme:watch-walkthrough20260920:${role}:SYN008078`;
   const locked = !!status && ((status.accessRequired&&!status.authenticated)||status.role!==role);
   const ready = !!status?.configured && !locked;
   const refresh = useCallback(async () => {

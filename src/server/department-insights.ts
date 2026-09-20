@@ -1,3 +1,4 @@
+import {planningBalance,flaggedBalance} from '../lib/leave-planning';
 import raw from '../data/workforce.json';
 import policies from '../data/policies.json';
 import type {Booking,LeaveRecord,Shift} from '../lib/workforce-types';
@@ -67,7 +68,7 @@ export function getDepartmentInsights(month:string,bookings:Booking[]=[]):Depart
   const balances=getBalances(employee.id,AS_OF);
   const history=[YEAR-1,YEAR].flatMap(year=>summarizeHistory(getLeave(employee.id,`${year}-01-01`,`${year}-12-31`),year,AS_OF));
   const noPrevious=!history.some(item=>item.year===YEAR-1&&item.records>0);
-  return {id:employee.id,name:name(employee.id),role:employee.role,rate:employee.rate,balances,leave:[...calendarImported(getLeave(employee.id,start,end),start,end),...calendarRequests(bookings,employee.id,start,end)].sort((a,b)=>a.start.localeCompare(b.start)),history,excess:balances.some(balance=>balance.excess),membershipBasis:employee.membershipBasis,contractStatus:employee.contractStatus,historyNote:`Only Historical / Leave Taken records enter annual history. Booked Leave / Future and Leave Taken / Future stay separate.${noPrevious?` No safely summable ${YEAR-1} records were found; this does not mean zero leave.`:''}`};
+  return {id:employee.id,name:name(employee.id),role:employee.role,rate:employee.rate,balances,leave:[...calendarImported(getLeave(employee.id,start,end),start,end),...calendarRequests(bookings,employee.id,start,end)].sort((a,b)=>a.start.localeCompare(b.start)),history,excess:balances.some(planningBalance),membershipBasis:employee.membershipBasis,contractStatus:employee.contractStatus,historyNote:`Only Historical / Leave Taken records enter annual history. Booked Leave / Future and Leave Taken / Future stay separate.${noPrevious?` No safely summable ${YEAR-1} records were found; this does not mean zero leave.`:''}`};
  });
  return {month,asOf:AS_OF,unit:UNIT,employees,limitations};
 }
@@ -76,7 +77,7 @@ export function getLeavePlan(employeeId:string,bookings:Booking[]=[]):LeavePlan 
  const people=getDepartmentEmployees(UNIT,AS_OF,START,END);
  const employee=people.find(person=>person.id===employeeId);
  if(!employee)throw new Error('Employee is not a current member of this department.');
- const balance=getBalances(employeeId,AS_OF).filter(item=>item.excess&&((item.code==='AL'&&item.type==='ANNUAL LEAVE')||(item.code==='LS'&&item.type==='LONG SERVICE LEAVE'))).sort((a,b)=>a.code.localeCompare(b.code))[0];
+ const balance=flaggedBalance(getBalances(employeeId,AS_OF));
  const policy=policies.documents.find(document=>document.id==='accrued-leave');
  const plan:LeavePlan={employeeId,name:name(employeeId),leaveCode:balance?.code||'',leaveType:balance?.type||'',balanceHours:balance?.remainingHours??0,bookedHours:balance?.bookedHours??null,balanceEffectiveDate:balance?.effectiveDate??null,eligible:!!balance&&employee.contractStatus==='verified',reason:balance?'The source balance carries an excess flag. An optional leave-planning conversation may help; the flag is not proof of a policy breach.':'No current annual or long-service balance has a recorded excess flag. No excess-leave invitation is suggested.',policyUrl:policy?.pdfUrl||policy?.url||'',suggestions:[],limitations:[...limitations,'Suggestions compare recorded same-role department assignments and known absences. They are inferred lower-impact options, never guaranteed safe staffing or an approval.','Source booked balance hours are shown separately and not deducted again from remaining hours. Pending workspace requests reserve additional hours.','Long-service leave portions and timing require agreement and applicable-policy verification. A proposed block is discussion material, not confirmation of entitlement to that portion.']};
  if(!balance)return plan;
