@@ -19,7 +19,7 @@ Copy `.env.example` to `.env.local` and configure the server variables described
 
 The backend queries a read-only database containing **900,095 retained records from 945,381 source rows** across all four synthetic workforce CSVs. Balances, rosters and profiles use this full database; swap matching explicitly uses the validated candidate extract. See [full data provenance](docs/full-data.md). The compressed database is included only in server functions.
 
-Tool activity is visible in the chat panel. Requests require an explicit confirmation click; the model cannot approve leave or contact colleagues. Separate employee and manager access codes select the synthetic roles. These codes are not a substitute for organizational identity management.
+Tool activity is visible in the chat panel. Requests require an explicit confirmation click; the model cannot approve leave or contact colleagues. Employee and manager views automatically select signed synthetic-role sessions without access codes. The public application is currently open for demonstration; this is not organizational identity management.
 
 ## Workflow
 
@@ -52,7 +52,7 @@ See `docs/policy-evidence.md` for source clauses and applicability.
 
 ## Boundaries
 
-The Foundry assistant uses server-side model tool calls and a signed, access-code session for synthetic employee SYN008078. Confirmed assistant and calendar requests, manager decisions, and leave-plan invitations persist in private Azure Table Storage. Unsubmitted calendar drafts remain in browser storage. External messaging, live roster writeback, payroll and HSS integration are not connected. Colleague responses remain previews; manager approval requires clinical verification.
+The Foundry assistant uses server-side model tool calls and a signed synthetic-role session for employee SYN008078. Confirmed assistant and calendar requests, manager decisions, and leave-plan invitations persist in private Azure Table Storage. Unsubmitted calendar drafts remain in browser storage. External messaging, live roster writeback, payroll and HSS integration are not connected. Colleague responses remain previews; manager approval requires clinical verification.
 
 ## Department leave planning
 

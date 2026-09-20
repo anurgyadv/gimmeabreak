@@ -54,10 +54,11 @@ export default function FoundryChat({manager=false}:{manager?:boolean}) {
   const refresh = useCallback(async () => {
     statusRequest.current?.abort(); const control=new AbortController(); statusRequest.current=control;
     setChecking(true); setError('');
-    try {const result=await fetch('/api/chat/status',{credentials:'same-origin',cache:'no-store',signal:control.signal}); if(!result.ok)throw new Error(await failure(result,'Unable to check the assistant connection.')); const body=await result.json(); if(typeof body.configured!=='boolean')throw new Error('The assistant returned an invalid connection status.'); setStatus(body);}
+    try {const sessionResult=await fetch('/api/chat/session',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({role}),signal:control.signal});if(!sessionResult.ok)throw new Error(await failure(sessionResult,'Unable to connect your workspace.'));const sessionBody=await sessionResult.json();setEmployee(sessionBody.employee||null);window.dispatchEvent(new CustomEvent('gimme:server-request'));window.dispatchEvent(new CustomEvent('gimme:session'));const result=await fetch('/api/chat/status',{credentials:'same-origin',cache:'no-store',signal:control.signal}); if(!result.ok)throw new Error(await failure(result,'Unable to check the assistant connection.')); const body=await result.json(); if(typeof body.configured!=='boolean')throw new Error('The assistant returned an invalid connection status.'); setStatus(body);}
     catch(e) {if(!control.signal.aborted){setStatus(null);setError(e instanceof Error?e.message:'Unable to connect.');}}
     finally {if(!control.signal.aborted)setChecking(false);}
-  },[]);
+  },[role]);
+  useEffect(()=>{void refresh()},[refresh]);
   const close=useCallback(()=>{request.current?.abort(); accessRequest.current?.abort(); actionRequest.current?.abort();statusRequest.current?.abort();setConfirming(null); setAccessCode('');window.dispatchEvent(new CustomEvent('gimme:server-request')); setSigningIn(false); setChecking(false); setOpen(false); trigger.current?.focus();},[]);
   useEffect(()=>{
     const openChat=(event:Event)=>{const prompt=(event as CustomEvent<{prompt?:string}>).detail?.prompt;setOpen(true);if(typeof prompt==='string')setInput(prompt.slice(0,4000));};
@@ -87,13 +88,6 @@ export default function FoundryChat({manager=false}:{manager?:boolean}) {
   },[open,refresh,close]);
   useEffect(()=>{if(scroll.current)scroll.current.scrollTop=scroll.current.scrollHeight;},[messages,busy,error]);
   const update=(id:string,change:(message:Message)=>Message)=>setMessages(previous=>previous.map(m=>m.id===id?change(m):m));
-  async function signIn(e:React.FormEvent) {
-    e.preventDefault();if(!accessCode.trim()||signingIn)return;
-    const control=new AbortController();accessRequest.current=control;setSigningIn(true);setError('');
-    try {const result=await fetch('/api/chat/session',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({accessCode:accessCode.trim(),role}),signal:control.signal}); if(!result.ok)throw new Error(await failure(result,'That access code was not accepted.')); const body=await result.json();if(!body.ok)throw new Error(body.message||'Unable to start your session.');setEmployee(body.employee||null);setStatus(s=>s?{...s,authenticated:true,role}:s);setAccessCode('');window.dispatchEvent(new CustomEvent('gimme:server-request'));setTimeout(()=>composer.current?.focus(),0);}
-    catch(e){if(!control.signal.aborted)setError(e instanceof Error?e.message:'Unable to start your session.');}
-    finally{if(!control.signal.aborted)setSigningIn(false);}
-  }
   async function send(text=input) {
     const content=text.trim();if(!content||!ready||sending.current||confirming)return;
     sending.current=true;setBusy(true);setError('');setInput('');
@@ -141,11 +135,11 @@ export default function FoundryChat({manager=false}:{manager?:boolean}) {
     {open&&<div className="fc-overlay" onClick={e=>{if(e.target===e.currentTarget)close();}}>
       <section className="fc-panel" ref={panel} role="dialog" aria-modal="true" aria-labelledby={headingId} tabIndex={-1}>
         <header className="fc-header"><span className="fc-mark"><Leaf size={25}/></span><div><h2 id={headingId}>{manager?'A little help for your team':'A little help with your leave'}</h2><p>Your leave assistant</p></div><button className="fc-icon" onClick={close} aria-label="Close chat"><X size={21}/></button></header>
-        <div className="fc-connection"><span className={ready?'connected':''}/><small>{checking?'Checking connection…':!status?'Connection unavailable':!status.configured?'Model not connected':locked?'Sign in to access your records':employee?`${employee.name} · ${employee.role}`:'Connected to your leave assistant'}</small>{!busy&&<button className="fc-icon" onClick={()=>void refresh()} disabled={checking} aria-label="Refresh connection"><RefreshCw size={14} className={checking?'fc-spin':''}/></button>}</div>
+        <div className="fc-connection"><span className={ready?'connected':''}/><small>{checking?'Checking connection…':!status?'Connection unavailable':!status.configured?'Model not connected':locked?'Connecting your workspace':employee?`${employee.name} · ${employee.role}`:'Connected to your leave assistant'}</small>{!busy&&<button className="fc-icon" onClick={()=>void refresh()} disabled={checking} aria-label="Refresh connection"><RefreshCw size={14} className={checking?'fc-spin':''}/></button>}</div>
         <div className="fc-body" ref={scroll}>
           {!messages.length&&<div className="fc-welcome"><div className="fc-welcome-art"><Leaf size={34}/></div><h3>Let’s make room for a break.</h3><p>{manager?<>Ask about your department’s roster,<br/>leave requests and policy checks.</>:<>Ask about your balances, your roster,<br/>or the dates you have in mind.</>}</p></div>}
           {status&&!status.configured&&<div className="fc-notice"><ShieldCheck size={20}/><div><strong>Your AI assistant isn’t connected yet</strong><p>{status.message||'Connect the Azure model to start chatting with your records.'}</p></div></div>}
-          {locked&&status?.configured&&<form className="fc-access" onSubmit={signIn}><LockKeyhole size={21}/><h3>Open your secure session</h3><p>{manager?'Use your manager access code to review your department.':'Use your employee access code to chat with your own records.'}</p><label htmlFor={codeId}>{manager?'Manager':'Employee'} access code</label><input id={codeId} type="password" value={accessCode} onChange={e=>setAccessCode(e.target.value)} autoComplete="off" maxLength={256} required disabled={signingIn}/><button className="fc-primary" disabled={signingIn||!accessCode.trim()}>{signingIn?<><LoaderCircle className="fc-spin" size={17}/>Connecting…</>:'Continue securely'}</button></form>}
+          {locked&&status?.configured&&<div className="fc-access"><h3>Connect your workspace</h3><button className="fc-primary" onClick={()=>void refresh()} disabled={checking}>{checking?'Connecting…':'Reconnect'}</button></div>}
           {!messages.length&&ready&&<div className="fc-prompts">{(manager?managerPrompts:prompts).map(prompt=><button key={prompt} onClick={()=>void send(prompt)} disabled={busy}>{prompt}<ArrowUp size={15}/></button>)}</div>}
           <div className="fc-messages" role="log" aria-label="Chat messages" aria-live="polite" aria-relevant="additions text">
             {messages.map(message=><article key={message.id} className={`fc-message ${message.role}`}><span className="fc-author">{message.role==='user'?'You':'GimmeABreak'}</span>

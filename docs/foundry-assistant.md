@@ -37,3 +37,5 @@ No Teams/email connector is configured. The assistant must not claim it sent a m
 ## Verification
 
 `npm test -- --reporter=dot`, `npm run build`, then test `/api/chat/status`. Unlock with the private employee access code and ask “What are my leave balances?”. A live integration check must show an actual Foundry response and `get_my_balances` tool event, including129.091 annual hours as of17 September2026. Unit tests use a mocked provider only to verify orchestration; they do not prove Azure connectivity.
+
+Access-code prompts are temporarily disabled at user request. The app automatically opens an employee or manager signed session when switching views. Anyone visiting the public app can select either synthetic role. Session signing, role checks, same-origin mutation checks and model usage limits remain enforced.
