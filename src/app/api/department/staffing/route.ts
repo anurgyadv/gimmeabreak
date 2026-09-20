@@ -1,0 +1,5 @@
+import {getSession,readBody,sameOrigin} from '@/server/chat-security';
+import {getStaffingFloors,saveStaffingFloors,validateFloors} from '@/server/staffing-plan';
+export const runtime='nodejs';export const dynamic='force-dynamic';
+export async function GET(req:Request){if(!getSession(req))return Response.json({message:'Open an employee or manager session first.'},{status:401});try{return Response.json({floors:await getStaffingFloors()},{headers:{'Cache-Control':'no-store'}})}catch{return Response.json({message:'Unable to load staffing settings.'},{status:503})}}
+export async function PUT(req:Request){const session=getSession(req);if(!session)return Response.json({message:'Open a manager session first.'},{status:401});if(session.role!=='manager')return Response.json({message:'Only managers can change staffing settings.'},{status:403});try{sameOrigin(req);const body=await readBody(req,100000);const floors=validateFloors(body.floors);return Response.json({floors:await saveStaffingFloors(floors)})}catch{return Response.json({message:'Could not save staffing settings. Check the period, roles and values (0–30), then retry.'},{status:400})}}

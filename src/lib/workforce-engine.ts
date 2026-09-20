@@ -47,7 +47,7 @@ export function findSwaps(w:Workforce,p:PolicyIndex,dates:string[]):SwapOption[]
  }
  }}return options.sort((a,b)=>Number(b.kind==='swap')-Number(a.kind==='swap')).slice(0,24);
 }
-export function canApprove(b:{status:string;assessment:Assessment},verified:boolean){return b.status==='manager-review'&&b.assessment.canProceed&&verified}
+export function canApprove(b:{status:string;assessment:Assessment;swap?:SwapOption|null;swapInvitation?:Booking['swapInvitation']},verified:boolean){return b.status==='manager-review'&&b.assessment.canProceed&&verified&&(!b.swap||b.swapInvitation?.status==='accepted')}
 
 // Reserve existing local requests; a proposed colleague is not offered twice before resolution.
 export const activeRequests=(requests:Booking[],exclude?:string)=>requests.filter(r=>r.id!==exclude&&!['declined','changes-requested','colleague-declined'].includes(r.status));

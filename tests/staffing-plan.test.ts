@@ -1,0 +1,26 @@
+import {afterEach,describe,expect,it,vi} from 'vitest';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {getStaffingFloors,saveStaffingFloors,staffingImpact,validateFloors} from '../src/server/staffing-plan';
+import {floorKey} from '../src/lib/staffing-requirements';
+import type {Booking,Employee,Shift,SwapOption,Workforce} from '../src/lib/workforce-types';
+import {assessWithGuidance,alternativeLeaveDates} from '../src/server/leave-guidance';
+import {datesBetween} from '../src/lib/workforce-engine';
+import {PUT} from '../src/app/api/department/staffing/route';
+import {COOKIE,newSession,signValue} from '../src/server/chat-security';
+const date='2026-09-21',role='Registered Nurse';
+const shift=(id:string,employeeId:string,day=date):Shift=>({id,employeeId,date:day,start:'07:00',end:'15:30',unit:'U',unitName:'Unit',mealMinutes:30,netHours:8,payPeriodStart:date,payPeriodEnd:'2026-10-04',workCode:'D'});
+const w:Workforce={employeeId:'a',unit:'U',period:{start:date,end:'2026-10-04',decisionDate:'2026-09-19'},employees:['a','b','c','d'].map(id=>({id,role} as Employee)),shifts:[shift('a1','a'),shift('b1','b'),shift('c1','c'),shift('d2','d','2026-09-22')],leave:[],balances:[],sources:[],quality:{},notes:[]};
+const floors={[floorKey(date,0,role)]:3};
+const swap={employeeId:'d',kind:'swap',outgoing:w.shifts[0],returnShift:w.shifts[3]} as SwapOption;
+afterEach(()=>vi.unstubAllEnvs());
+describe('persisted staffing floors and leave impact',()=>{
+ it('validates exact period, role, window and integer limits; unset remains unknown',()=>{expect(validateFloors(floors)).toEqual(floors);for(const bad of [{[floorKey('2026-09-20',0,role)]:3},{[floorKey(date,0,'Unknown')]:3},{[floorKey(date,0,role)]:3.5},{[floorKey(date,0,role)]:31}])expect(()=>validateFloors(bad)).toThrow();expect(staffingImpact([date],[],{},null,w)[0].minimum).toBeNull()});
+ it('shows three required, three before and two after removing a duty',()=>{expect(staffingImpact([date],[],floors,null,w).find(s=>s.band==='Day')).toMatchObject({minimum:3,before:3,after:2,shortfall:1})});
+ it('models both sides of a swap while other requested days remain uncovered',()=>{const changed={...w,shifts:[...w.shifts,shift('a3','a','2026-09-23')]};const result=staffingImpact([date,'2026-09-23'],[],{...floors,[floorKey('2026-09-22',0,role)]:1,[floorKey('2026-09-23',0,role)]:1},swap,changed);expect(result.find(s=>s.date===date&&s.band==='Day')?.after).toBe(3);expect(result.find(s=>s.date==='2026-09-22'&&s.band==='Day')?.after).toBe(1);expect(result.find(s=>s.date==='2026-09-23'&&s.band==='Day')?.shortfall).toBe(1)});
+ it('excludes pending leave and does not count a cover candidate absent that day',()=>{const pending={employeeId:'d',dates:[date],status:'manager-review',leaveCode:'AL',leaveType:'Annual'} as Booking;const result=staffingImpact([date],[pending],floors,swap,w);expect(result.find(s=>s.band==='Day')?.after).toBe(2)});
+ it('honors isolated local state even if an Azure connection is configured',async()=>{const directory=await mkdtemp(path.join(tmpdir(),'staffing-test-'));vi.stubEnv('CHAT_LOCAL_STORE',path.join(directory,'requests.json'));vi.stubEnv('AZURE_STORAGE_CONNECTION_STRING','must-not-be-used');try{expect(await getStaffingFloors()).toEqual({});await saveStaffingFloors(floors);expect(await getStaffingFloors()).toEqual(floors)}finally{await rm(directory,{recursive:true,force:true})}});
+ it('keeps alternatives at the requested paid duration and never labels unknown floors cover-free',async()=>{const directory=await mkdtemp(path.join(tmpdir(),'staffing-guidance-'));vi.stubEnv('CHAT_LOCAL_STORE',path.join(directory,'requests.json'));try{const unknown=await alternativeLeaveDates([date],'AL',[]);expect(unknown.options.length).toBeGreaterThan(0);expect(unknown.options.every(o=>o.hours===8&&!o.noAdditionalCover)).toBe(true);const configured=Object.fromEntries(datesBetween(date,'2026-10-04').flatMap(d=>[0,1,2].map(b=>[floorKey(d,b,role),0])));await saveStaffingFloors(configured);const known=await alternativeLeaveDates([date],'AL',[]);expect(known.options.every(o=>o.hours===8&&o.noAdditionalCover)).toBe(true);expect(known.offDuty.dates).toContain('2026-09-25');await saveStaffingFloors({[floorKey(date,0,role)]:30});const assessment=await assessWithGuidance([date],'AL',[]);expect(assessment.assessment.canProceed).toBe(true);expect(assessment.guidance.title).toBe('Your leave needs cover');expect(assessment.guidance.reasons[0]).toContain('at least 30')}finally{await rm(directory,{recursive:true,force:true})}});
+ it('rejects employee writes and cross-origin manager writes',async()=>{const key='staffing-tests-only-secret-is-at-least-32-chars';vi.stubEnv('CHAT_SESSION_SECRET',key);const request=(manager:boolean,origin:string)=>new Request('http://localhost/api/department/staffing',{method:'PUT',headers:{cookie:`${COOKIE}=${signValue(newSession(manager?'manager':'employee'),key)}`,origin,'Content-Type':'application/json'},body:JSON.stringify({floors})});expect((await PUT(request(false,'http://localhost'))).status).toBe(403);expect((await PUT(request(true,'http://attacker.test'))).status).toBe(400)});
+});
